@@ -1,0 +1,63 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+web-build/
+out/
+.next/
+.expo/
+/ios
+/android
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Native bridge/Keys
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+
+# Project specific exclusions
+opinor-api-main/Opinor_Credentials.docx
+opinor-api-main/scripts/generate-credentials-doc.ts
+opinor-api-main/src/database/seeds/run-seed.ts
+
+# Misc
+.temp/
+.tmp/
+.metro-health-check*
+*.tsbuildinfo
