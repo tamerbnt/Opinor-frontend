@@ -186,11 +186,22 @@ export class NotificationsService {
     private userRepository: Repository<User>,
   ) {}
 
-  async getNotifications(userId: string, page = 1, limit = 20) {
+  async getNotifications(
+    userId: string, 
+    page = 1, 
+    limit = 20, 
+    sortDir: 'ASC' | 'DESC' = 'DESC', 
+    isRead?: boolean
+  ) {
+    const where: any = { userId };
+    if (isRead !== undefined) {
+      where.isRead = isRead;
+    }
+
     const [notifications, total] =
       await this.notificationRepository.findAndCount({
-        where: { userId },
-        order: { createdAt: 'DESC' },
+        where,
+        order: { createdAt: sortDir },
         skip: (page - 1) * limit,
         take: limit,
       });

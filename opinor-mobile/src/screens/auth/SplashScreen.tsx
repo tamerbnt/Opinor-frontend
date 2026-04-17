@@ -2,17 +2,60 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, Image, ImageBackground, StatusBar } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 
+import { useQueryClient } from '@tanstack/react-query';
+import * as SecureStore from 'expo-secure-store';
+import { useAuthStore } from '../../store/useAuthStore';
+import { getStartupData } from '../../api/dashboard';
+
 export const SplashScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
+  const queryClient = useQueryClient();
+  const signIn = useAuthStore(state => state.signIn);
 
   useEffect(() => {
-    // Delay to allow the brand impression to sink in
-    const timer = setTimeout(() => {
-      navigation.replace('Onboarding');
-    }, 2500);
+    const bootstrapAsync = async () => {
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1500)); // Minimum branding delay
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
+      try {
+        const token = await SecureStore.getItemAsync('accessToken');
+        const userProfileStr = await SecureStore.getItemAsync('userProfile');
+        
+        if (token) {
+          // Prefetch everything in parallel with the delay
+          const prefetchPromise = queryClient.prefetchQuery({
+            queryKey: ['dashboardStartup'],
+            queryFn: getStartupData,
+            staleTime: 1000 * 60 * 5, // Keep it fresh for 5 mins
+          }).catch(err => console.log('Prefetch failed:', err));
+
+          await Promise.all([minDelay, prefetchPromise]);
+          
+          // EDGE CASE: If the token was expired, the Axios interceptor might have called signOut() 
+          // internally and deleted the token from SecureStore during the prefetch. 
+          // We must verify the token survived the prefetch before committing it to state.
+          const survivedToken = await SecureStore.getItemAsync('accessToken');
+          if (!survivedToken) {
+            navigation.replace('Onboarding');
+            return;
+          }
+
+          // Re-hydrate auth store to trigger RootNavigator swap
+          let profile = null;
+          try { if (userProfileStr) profile = JSON.parse(userProfileStr); } catch(e) {}
+          await signIn(survivedToken, profile);
+          
+          return; // Stop here, RootNavigator unmounts us
+        }
+      } catch (e) {
+        console.log('Bootstrap error', e);
+      }
+
+      await minDelay;
+      navigation.replace('Onboarding');
+    };
+
+    bootstrapAsync();
+  }, [navigation, queryClient, signIn]);
 
   return (
     <View style={styles.container}>

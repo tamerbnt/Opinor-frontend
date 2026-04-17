@@ -4,10 +4,12 @@ import { AppText } from '../../components/ui/AppText';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { CustomInput } from '../../components/ui/CustomInput';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export const BookingFormScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
   const containerWidth = width > 500 ? 390 : width;
 
   return (
@@ -25,18 +27,18 @@ export const BookingFormScreen = ({ navigation }: any) => {
 
         <ScrollView showsVerticalScrollIndicator={false}>
           <AppText variant="h2" weight="bold" colorToken={colors.dark} style={styles.title}>
-            Book a meeting
+            {t('booking.form.title')}
           </AppText>
 
           <View style={styles.form}>
-            <CustomInput label="Full Name" placeholder="Enter your full name" />
-            <CustomInput label="Email" placeholder="Enter your email" keyboardType="email-address" />
-            <CustomInput label="Phone number" placeholder="Enter your phone number" keyboardType="phone-pad" />
-            <CustomInput label="Additional note" placeholder="..." multiline numberOfLines={3} style={styles.textArea} />
+            <CustomInput label={t('booking.form.name_label')} placeholder={t('booking.form.name_placeholder')} />
+            <CustomInput label={t('booking.form.email_label')} placeholder={t('booking.form.email_placeholder')} keyboardType="email-address" />
+            <CustomInput label={t('booking.form.phone_label')} placeholder={t('booking.form.phone_placeholder')} keyboardType="phone-pad" />
+            <CustomInput label={t('booking.form.note_label')} placeholder={t('booking.form.note_placeholder')} multiline numberOfLines={3} style={styles.textArea} />
           </View>
 
           <PrimaryButton 
-            label="Book now" 
+            label={t('booking.form.submit_btn')} 
             onPress={() => navigation.navigate('BookingSuccess')} 
             style={styles.submitButton}
           />
@@ -46,7 +48,7 @@ export const BookingFormScreen = ({ navigation }: any) => {
             style={styles.loginLink}
           >
             <AppText variant="caption">
-              Already have an account? <AppText variant="caption" weight="bold" colorToken={colors.blue}>Login</AppText>
+              {t('booking.form.has_account')} <AppText variant="caption" weight="bold" colorToken={colors.blue}>{t('booking.form.login_link')}</AppText>
             </AppText>
           </TouchableOpacity>
         </ScrollView>

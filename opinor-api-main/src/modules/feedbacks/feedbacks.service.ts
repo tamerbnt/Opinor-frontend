@@ -77,6 +77,7 @@ export class FeedbacksService {
       sentiment,
       status,
       category,
+      sortDir = 'DESC',
     } = queryDto;
     const skip = (page - 1) * limit;
 
@@ -88,7 +89,7 @@ export class FeedbacksService {
 
     const [feedbacks, total] = await this.feedbackRepository.findAndCount({
       where,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: sortDir },
       skip,
       take: limit,
     });

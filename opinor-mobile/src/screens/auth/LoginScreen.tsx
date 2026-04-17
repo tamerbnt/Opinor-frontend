@@ -4,30 +4,54 @@ import { AppText } from '../../components/ui/AppText';
 import { CustomInput } from '../../components/ui/CustomInput';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/useAuthStore';
 import { SocialButton } from '../../components/ui/SocialButton';
 import { ArrowLeft } from 'lucide-react-native';
-
+import { useQueryClient } from '@tanstack/react-query';
+import { getStartupData } from '../../api/dashboard';
 
 export const LoginScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
-  
-  // Constrain width for web fidelity
-  const containerWidth = width > 500 ? 390 : width;
+  const { t } = useTranslation();
   const signIn = useAuthStore(state => state.signIn);
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  // Constrain width for web fidelity
+  const containerWidth = width > 500 ? 390 : width;
+
   const handleLogin = async () => {
     setIsLoading(true);
-    // Developer Bypass: Mocking authentication for rapid UI/UX verification
-    setTimeout(async () => {
-      await signIn('dev-token-bypass', { businessName: "PAUL'S COFFEE" });
+    
+    // Simulate Login API Call
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    try {
+      const mockToken = 'dev-token-bypass';
+      const mockProfile = { businessName: "PAUL'S COFFEE" };
+
+      // Architecture: High-speed parallel prefetch during the loader
+      await queryClient.prefetchQuery({
+        queryKey: ['dashboardStartup'],
+        queryFn: getStartupData,
+        staleTime: 1000 * 60 * 5,
+      }).catch(err => console.log('Prefetch warning:', err));
+      
+      // Once prefetch is done (or failed), we commit the token.
+      // This will trigger the RootNavigator to swap to TabNavigator, 
+      // and DashboardScreen will mount with data already in RAM.
+      await signIn(mockToken, { id: 'dev-user', email: 'dev@opinor.app', businessName: "PAUL'S COFFEE" });
+    } catch (e) {
+      console.log('Login failed', e);
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   return (
@@ -39,21 +63,19 @@ export const LoginScreen = ({ navigation }: any) => {
         {/* Navigation Header */}
         <View style={styles.navHeader}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color={colors.dark} size={24} />
+            <ArrowLeft color={isDark ? colors.white : colors.dark} size={24} />
           </TouchableOpacity>
-          <AppText weight="semiBold" style={styles.navTitle}>Login</AppText>
           <View style={{ width: 24 }} />
         </View>
 
         <View style={styles.header}>
-          <AppText variant="h1" weight="bold" style={styles.title}>Login</AppText>
+          <AppText variant="h1" weight="bold" style={styles.title}>{t('auth.login.title')}</AppText>
         </View>
-
 
         {/* Dynamic Themed Inputs */}
         <CustomInput
-          label="Email"
-          placeholder="Enter your email"
+          label={t('auth.login.email')}
+          placeholder={t('auth.login.email_placeholder')}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -61,8 +83,8 @@ export const LoginScreen = ({ navigation }: any) => {
         />
         
         <CustomInput
-          label="Password"
-          placeholder="Enter your password"
+          label={t('auth.login.password')}
+          placeholder={t('auth.login.password_placeholder')}
           value={password}
           onChangeText={setPassword}
           isPassword
@@ -75,12 +97,12 @@ export const LoginScreen = ({ navigation }: any) => {
           activeOpacity={0.7}
         >
           <AppText variant="body" colorToken={colors.blue} weight="semiBold">
-            Forgot Password?
+            {t('auth.login.forgot_password')}
           </AppText>
         </TouchableOpacity>
 
         <PrimaryButton 
-          label="Login" 
+          label={t('auth.login.submit')} 
           onPress={handleLogin} 
           loading={isLoading} 
           style={styles.submitBtn} 
@@ -88,22 +110,22 @@ export const LoginScreen = ({ navigation }: any) => {
 
         <View style={styles.dividerContainer}>
           <View style={[styles.dividerLine, { backgroundColor: isDark ? '#374151' : '#E5E7EB' }]} />
-          <AppText variant="caption" style={styles.dividerText}>Or continue with</AppText>
+          <AppText variant="caption" style={styles.dividerText}>{t('auth.login.or_continue')}</AppText>
           <View style={[styles.dividerLine, { backgroundColor: isDark ? '#374151' : '#E5E7EB' }]} />
         </View>
 
         <SocialButton 
-          label="Continue with Google" 
+          label={t('auth.login.google_login')} 
           onPress={() => console.log('Google Login')} 
           style={styles.socialBtn}
         />
 
         {/* Conversion Logic */}
         <View style={styles.signupContainer}>
-          <AppText variant="muted">Don't have an account? </AppText>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')} activeOpacity={0.7}>
+          <AppText variant="muted">{t('auth.login.no_account')}</AppText>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')} activeOpacity={0.7} style={{ marginLeft: 6 }}>
             <AppText variant="body" colorToken={colors.blue} weight="bold">
-              Sign Up
+              {t('auth.login.signup_link')}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -166,4 +188,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   }
 });
-

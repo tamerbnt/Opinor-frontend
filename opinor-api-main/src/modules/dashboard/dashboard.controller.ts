@@ -52,9 +52,9 @@ export class DashboardController {
   })
   @ApiQuery({
     name: 'period',
-    enum: ['week', 'month'],
+    enum: ['day', 'week', 'month'],
     required: false,
-    description: 'Time period: week (7 days) or month (30 days)',
+    description: 'Time period: day (24 hours), week (7 days) or month (30 days)',
   })
   @ApiOkResponse({
     description: 'Feedback trend data',
@@ -106,5 +106,17 @@ export class DashboardController {
   })
   async getAchievements(@CurrentUser() user: User) {
     return this.dashboardService.getAchievements(user.id);
+  }
+
+  @Get('startup')
+  @ApiOperation({
+    summary: 'Get optimized dashboard startup data',
+    description: 'Returns combined summary, weekly chart, and achievements for faster initial load',
+  })
+  @ApiOkResponse({
+    description: 'Dashboard startup payload',
+  })
+  async getStartupData(@CurrentUser() user: User) {
+    return this.dashboardService.getStartupData(user.id);
   }
 }

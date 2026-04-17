@@ -1,43 +1,18 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
-  View, StyleSheet, FlatList, TouchableOpacity,
+  View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../../components/ui/AppText';
 import { useTheme } from '../../theme/ThemeContext';
-import { Star, Smile, Frown, Meh, SlidersHorizontal, Circle, CheckCircle2 } from 'lucide-react-native';
+import { Star, Smile, Frown, Meh, SlidersHorizontal, Circle, CheckCircle2, ChevronLeft } from 'lucide-react-native';
 import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import { useTranslation } from 'react-i18next';
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { SwipeableDeck, Feedback } from '../../components/ui/SwipeableDeck';
-import { Colors } from '../../constants/Theme';
-
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const DUMMY_FEEDBACKS: Feedback[] = [
-  {
-    id: '1',
-    customerName: 'Alice',
-    initials: 'AL',
-    rating: 4,
-    comment: 'The overall experience was really good. The only reason I didn\'t give five stars is because my order took a bit longer than expected, but everything else was great. I\'ll definitely come again.',
-    date: 'Oct 11, 14:30',
-  },
-  {
-    id: '2',
-    customerName: 'Bob',
-    initials: 'BO',
-    rating: 2,
-    comment: 'I was disappointed with my visit today. The staff seemed overwhelmed, and it took more than 20 minutes to get my order. When it finally arrived, the drink wasn\'t prepared the way I asked.',
-    date: 'Oct 11, 13:30',
-  },
-  {
-    id: '3',
-    customerName: 'Charlie',
-    initials: 'CH',
-    rating: 3,
-    comment: 'The experience was okay overall. The place was clean and the staff were polite, but nothing really stood out. The service could be a bit faster, and the prices feel slightly high for what you get.',
-    date: 'Oct 11, 11:30',
-  },
-];
+import { SwipeableDeck } from '../../components/ui/SwipeableDeck';
+import { useUIStore } from '../../store/UIStore';
+import { getFeedbacks, updateFeedbackStatus, FeedbackData, GetFeedbacksParams } from '../../api/feedbacks';
 
 type SortOption = 'newest' | 'older' | 'read' | 'unread';
 
@@ -57,7 +32,7 @@ const StarRow = ({ rating }: { rating: number }) => (
 );
 
 // ─── Feedback Card (List View) ────────────────────────────────────────────────
-const FeedbackCard = ({ item, isDark, colors }: { item: Feedback; isDark: boolean; colors: any }) => {
+const FeedbackCard = ({ item, isDark, colors }: { item: FeedbackData; isDark: boolean; colors: any }) => {
   const getSentimentIcon = (r: number) => {
     if (r >= 4) return <Smile size={16} color={colors.green} strokeWidth={2} />;
     if (r === 3) return <Meh size={16} color="#ECD908" strokeWidth={2} />;
@@ -74,18 +49,19 @@ const FeedbackCard = ({ item, isDark, colors }: { item: Feedback; isDark: boolea
       elevation: isDark ? 0 : 3,
       borderWidth: isDark ? 1 : 0,
       borderColor: isDark ? '#2A2A2A' : 'transparent',
+      opacity: item.status === 'viewed' || item.status === 'responded' ? 0.7 : 1, // Visually dim read items
     }]}>
       {/* Top row: Status + Time */}
       <View style={styles.cardHeader}>
         <View style={styles.sentimentInfo}>
           {getSentimentIcon(item.rating)}
-          <AppText style={[styles.dateText, { color: '#888888' }]}>{item.date}</AppText>
+          <AppText variant="caption" style={[styles.dateText, { color: colors.textSecondary }]}>{item.date}</AppText>
         </View>
       </View>
 
       {/* Body */}
-      <AppText style={[styles.commentText, { color: colors.dark }]} numberOfLines={4}>
-        {item.comment}
+      <AppText style={styles.commentText} numberOfLines={4}>
+        "{item.text}"
       </AppText>
 
       {/* Footer: Stars */}
@@ -98,45 +74,132 @@ const FeedbackCard = ({ item, isDark, colors }: { item: Feedback; isDark: boolea
 export const FeedbacksScreen = () => {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
   
   const [isDeckView, setIsDeckView] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   
+  const { setTabBarHidden } = useUIStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
-
   const snapPoints = useMemo(() => ['45%'], []);
 
+  const handleSheetChange = useCallback((index: number) => {
+    setTabBarHidden(index >= 0);
+  }, [setTabBarHidden]);
+
+  // --- API DATA BINDINGS ---
+  
+  // 1. Unread Deck Query (Clamped limiting)
+  const { data: deckData, isLoading: isDeckLoading } = useQuery({
+    queryKey: ['unreadFeedbacks'],
+    queryFn: () => getFeedbacks({ status: 'new', limit: 15 }),
+    enabled: isDeckView,
+  });
+
+  const unreadFeedbacks = deckData?.feedbacks || [];
+
+  // 2. Infinite List Query
+  const {
+    data: listData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isListLoading
+  } = useInfiniteQuery({
+    queryKey: ['feedbacksList', sortBy],
+    queryFn: ({ pageParam = 1 }) => {
+      const q: GetFeedbacksParams = { page: pageParam, limit: 15 };
+      if (sortBy === 'newest') q.sortDir = 'DESC';
+      if (sortBy === 'older') q.sortDir = 'ASC';
+      if (sortBy === 'read') q.status = 'viewed'; // Or responded, but the DTO accepts single status string
+      if (sortBy === 'unread') q.status = 'new';
+      return getFeedbacks(q);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || !lastPage.pagination) return undefined;
+      const { page, totalPages } = lastPage.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    }
+  });
+
+  const flatListFeedbacks = useMemo(() => {
+    return listData?.pages.flatMap(page => page.feedbacks) || [];
+  }, [listData]);
+
+  // 3. Optimistic Swipe Mutation
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => updateFeedbackStatus(id, 'viewed'),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['unreadFeedbacks'] });
+      const previousDeck = queryClient.getQueryData<any>(['unreadFeedbacks']);
+      
+      // Optimistically eject the card from cache immediately
+      if (previousDeck) {
+        queryClient.setQueryData(['unreadFeedbacks'], {
+          ...previousDeck,
+          feedbacks: previousDeck.feedbacks.filter((f: any) => f.id !== id)
+        });
+      }
+      return { previousDeck };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(['unreadFeedbacks'], context?.previousDeck);
+    },
+    onSettled: () => {
+      // Invalidate both quietly in background to ensure sync
+      queryClient.invalidateQueries({ queryKey: ['unreadFeedbacks'] });
+      queryClient.invalidateQueries({ queryKey: ['feedbacksList'] });
+    }
+  });
+
+  // --- ACTIONS ---
+  
+  const handleDeckCardSwiped = (card: FeedbackData) => {
+    markReadMutation.mutate(card.id);
+  };
+
   const handleOpenFilters = () => {
-    setIsDeckView(false);
     bottomSheetRef.current?.expand();
   };
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
-    ),
-    []
-  );
+  const totalFeedbacksCount = listData?.pages[0]?.pagination?.total || flatListFeedbacks.length;
+  const displayCountText = t('feedbacks.count_received', { count: totalFeedbacksCount });
 
-  const displayCountText = `${DUMMY_FEEDBACKS.length} received today`;
-
+  // --- RENDER ---
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? Colors.dark.dark : Colors.light.white }]}>
+    <View style={[styles.container, { backgroundColor: isDark ? colors.dark : colors.white }]}>
       
       {/* ── Header ── */}
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <AppText weight="semiBold" style={[styles.screenTitle, { color: colors.dark }]}>
-          Feedbacks
-        </AppText>
+        <View style={styles.headerTopRow}>
+          {isDeckView ? (
+            <View style={{ width: 44 }} />
+          ) : (
+            <TouchableOpacity 
+              onPress={() => setIsDeckView(true)} 
+              style={styles.backButton}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.backCircle, { backgroundColor: isDark ? '#2A2A2A' : '#F1F5F9' }]} />
+              <ChevronLeft size={22} color={colors.blue} style={styles.backIcon} />
+            </TouchableOpacity>
+          )}
+          <AppText weight="bold" style={styles.screenTitle}>
+            {t('feedbacks.title')}
+          </AppText>
+          <View style={{ width: 44 }} />
+        </View>
         
         {isDeckView && (
           <TouchableOpacity 
-            style={[styles.pillFilterButton, { borderColor: isDark ? 'rgba(46,204,113,0.3)' : 'rgba(46,204,113,0.5)' }]}
+            style={[styles.pillFilterButton, { backgroundColor: isDark ? 'rgba(3, 135, 136, 0.1)' : '#F1F5F9' }]}
             onPress={handleOpenFilters}
             activeOpacity={0.7}
           >
-            <SlidersHorizontal size={14} color={colors.blue} style={{ marginRight: 6 }} />
-            <AppText weight="semiBold" style={{ color: colors.blue, fontSize: 13 }}>Filters</AppText>
+            <SlidersHorizontal size={14} color={colors.blue} style={{ marginRight: 6 }} strokeWidth={2.5} />
+            <AppText weight="semiBold" style={{ color: colors.blue, fontSize: 13 }}>{t('feedbacks.filters')}</AppText>
           </TouchableOpacity>
         )}
       </View>
@@ -144,16 +207,32 @@ export const FeedbacksScreen = () => {
       {/* ── Content Toggle ── */}
       {isDeckView ? (
         <View style={styles.deckWrapper}>
-          <SwipeableDeck data={DUMMY_FEEDBACKS} isDark={isDark} />
-          <AppText weight="semiBold" style={[styles.countTextCentered, { color: colors.dark }]}>
-            {displayCountText}
-          </AppText>
-          {/* We skip the hand drawn SVG line per instructions */}
+          {isDeckLoading && unreadFeedbacks.length === 0 ? (
+            <ActivityIndicator size="large" color={colors.blue} style={{ marginTop: 100 }} />
+          ) : (
+            <>
+              <SwipeableDeck 
+                data={unreadFeedbacks} 
+                isDark={isDark} 
+                onCardPress={() => setIsDeckView(false)}
+                onCardSwiped={handleDeckCardSwiped}
+                onDeckEmpty={() => setIsDeckView(false)}
+              />
+              <View style={styles.countWrapper}>
+                <AppText weight="bold" style={styles.countNumber}>
+                  {unreadFeedbacks.length}{' '}
+                </AppText>
+                <AppText variant="muted" style={styles.countLabel}>
+                  {t('feedbacks.received_today')}
+                </AppText>
+              </View>
+            </>
+          )}
         </View>
       ) : (
         <>
           <View style={styles.listHeaderRow}>
-            <AppText weight="semiBold" style={[styles.countTextLeft, { color: colors.dark }]}>
+            <AppText weight="bold" style={styles.countTextLeft}>
               {displayCountText}
             </AppText>
             <TouchableOpacity onPress={handleOpenFilters} style={styles.iconFilterBtn}>
@@ -161,15 +240,26 @@ export const FeedbacksScreen = () => {
             </TouchableOpacity>
           </View>
           
-          <FlatList
-            data={DUMMY_FEEDBACKS}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <FeedbackCard item={item} isDark={isDark} colors={colors} />
-            )}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-          />
+          {isListLoading && flatListFeedbacks.length === 0 ? (
+            <ActivityIndicator size="large" color={colors.blue} style={{ marginTop: 50 }} />
+          ) : (
+            <FlatList
+              data={flatListFeedbacks}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => (
+                <FeedbackCard item={item} isDark={isDark} colors={colors} />
+              )}
+              onEndReached={() => {
+                if (hasNextPage) fetchNextPage();
+              }}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={
+                isFetchingNextPage ? <ActivityIndicator size="small" color={colors.blue} style={{ padding: 20 }} /> : null
+              }
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
         </>
       )}
 
@@ -178,28 +268,33 @@ export const FeedbacksScreen = () => {
         ref={bottomSheetRef}
         index={-1}
         snapPoints={snapPoints}
-        backdropComponent={renderBackdrop}
+        onChange={handleSheetChange}
+        backdropComponent={(props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />}
         enablePanDownToClose
         backgroundStyle={{ backgroundColor: isDark ? '#1A1D21' : '#FFFFFF', borderRadius: 24 }}
         handleIndicatorStyle={{ backgroundColor: '#888', width: 40, height: 4 }}
       >
         <View style={styles.sheetContent}>
-          <AppText weight="semiBold" style={[styles.sheetTitle, { color: colors.dark }]}>Sort By</AppText>
+          <AppText weight="semiBold" style={[styles.sheetTitle, { color: colors.dark }]}>{t('feedbacks.sort_by')}</AppText>
 
           {/* Radio items */}
           {(['newest', 'older', 'read', 'unread'] as SortOption[]).map((option) => {
             const labelMap: Record<SortOption, string> = {
-              newest: 'Newest First',
-              older: 'Older First',
-              read: 'Read Notification',
-              unread: 'Unread Notification',
+              newest: t('feedbacks.sort_options.newest'),
+              older: t('feedbacks.sort_options.older'),
+              read: t('feedbacks.sort_options.read'),
+              unread: t('feedbacks.sort_options.unread'),
             };
             const isActive = sortBy === option;
             return (
               <TouchableOpacity 
                 key={option} 
                 style={styles.radioRow} 
-                onPress={() => setSortBy(option)}
+                onPress={() => {
+                  setSortBy(option);
+                  setIsDeckView(false); // Move to list view to respect filter
+                  bottomSheetRef.current?.close();
+                }}
                 activeOpacity={0.8}
               >
                 <AppText style={{ color: colors.dark, fontSize: 16 }}>{labelMap[option]}</AppText>
@@ -211,17 +306,8 @@ export const FeedbacksScreen = () => {
               </TouchableOpacity>
             );
           })}
-
-          <TouchableOpacity 
-            style={[styles.applyBtn, { backgroundColor: colors.blue }]}
-            onPress={() => bottomSheetRef.current?.close()}
-            activeOpacity={0.8}
-          >
-            <AppText weight="semiBold" style={{ color: '#FFFFFF', fontSize: 16 }}>Apply</AppText>
-          </TouchableOpacity>
         </View>
       </BottomSheet>
-
     </View>
   );
 };
@@ -235,9 +321,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+  },
   screenTitle: {
-    fontSize: 18,
-    marginBottom: 12,
+    fontSize: 22,
+  },
+  settingsBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pillFilterButton: {
     flexDirection: 'row',
@@ -246,6 +345,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: 1,
+    borderColor: 'transparent', // Added transparent border safety
   },
 
   /* Deck State */
@@ -253,9 +353,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  countTextCentered: {
-    fontSize: 16,
+  countWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 10,
+  },
+  countNumber: {
+    fontSize: 16,
+  },
+  countLabel: {
+    fontSize: 16,
+    opacity: 0.7,
   },
 
   /* List State */
@@ -302,6 +410,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     marginBottom: 16,
+    fontStyle: 'italic',
   },
   starRow: {
     flexDirection: 'row',
@@ -324,11 +433,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
   },
-  applyBtn: {
-    marginTop: 24,
-    borderRadius: 28,
-    height: 56,
+  backButton: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  backCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    position: 'absolute',
+  },
+  backIcon: {
+    zIndex: 1,
   }
 });

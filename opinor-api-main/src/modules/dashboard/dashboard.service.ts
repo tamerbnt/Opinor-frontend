@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThanOrEqual } from 'typeorm';
 import { Feedback, Achievement, User } from '../../database/entities';
-import { AchievementType } from '../../database/entities/enums';
+import { FeedbackStatus, AchievementType } from '../../database/entities/enums';
 
 @Injectable()
 export class DashboardService {
@@ -61,6 +61,20 @@ export class DashboardService {
       },
     });
 
+    // Get response rate
+    const totalCount = await this.feedbackRepository.count({
+      where: { businessId: userId, isHidden: false },
+    });
+    const respondedCount = await this.feedbackRepository.count({
+      where: {
+        businessId: userId,
+        isHidden: false,
+        status: FeedbackStatus.RESPONDED,
+      },
+    });
+    const responseRate =
+      totalCount > 0 ? (respondedCount / totalCount) * 100 : 0;
+
     return {
       success: true,
       data: {
@@ -68,49 +82,83 @@ export class DashboardService {
         totalFeedbacksToday: todayCount,
         totalFeedbacksThisWeek: weekCount,
         totalFeedbacksThisMonth: monthCount,
+        responseRate: parseFloat(responseRate.toFixed(1)),
         lastUpdated: new Date().toISOString(),
       },
     };
   }
 
-  async getFeedbackChart(userId: string, period: 'week' | 'month' = 'week') {
-    const days = period === 'week' ? 7 : 30;
+  async getFeedbackChart(
+    userId: string,
+    period: 'day' | 'week' | 'month' = 'week',
+  ) {
     const feedbackTrend: any[] = [];
 
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const startOfDay = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-      );
-      const endOfDay = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        23,
-        59,
-        59,
-      );
+    if (period === 'day') {
+      // Support for 24 hours
+      for (let i = 23; i >= 0; i--) {
+        const date = new Date();
+        date.setHours(date.getHours() - i, 0, 0, 0);
+        const startOfHour = new Date(date);
+        const endOfHour = new Date(date);
+        endOfHour.setMinutes(59, 59, 999);
 
-      const result = await this.feedbackRepository
-        .createQueryBuilder('feedback')
-        .select('COUNT(*)', 'count')
-        .addSelect('AVG(feedback.rating)', 'averageRating')
-        .where('feedback.businessId = :userId', { userId })
-        .andWhere('feedback.isHidden = :isHidden', { isHidden: false })
-        .andWhere('feedback.createdAt BETWEEN :start AND :end', {
-          start: startOfDay,
-          end: endOfDay,
-        })
-        .getRawOne();
+        const result = await this.feedbackRepository
+          .createQueryBuilder('feedback')
+          .select('COUNT(*)', 'count')
+          .addSelect('AVG(feedback.rating)', 'averageRating')
+          .where('feedback.businessId = :userId', { userId })
+          .andWhere('feedback.isHidden = :isHidden', { isHidden: false })
+          .andWhere('feedback.createdAt BETWEEN :start AND :end', {
+            start: startOfHour,
+            end: endOfHour,
+          })
+          .getRawOne();
 
-      feedbackTrend.push({
-        date: startOfDay.toISOString().split('T')[0],
-        count: parseInt(result.count) || 0,
-        averageRating: parseFloat(result.averageRating) || 0,
-      });
+        feedbackTrend.push({
+          date: startOfHour.toISOString(), // Full ISO for client-side local formatting
+          label: `${startOfHour.getHours().toString().padStart(2, '0')}:00`,
+          count: parseInt(result.count) || 0,
+          averageRating: parseFloat(result.averageRating) || 0,
+        });
+      }
+    } else {
+      const days = period === 'week' ? 7 : 30;
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const startOfDay = new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
+        );
+        const endOfDay = new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
+          23,
+          59,
+          59,
+        );
+
+        const result = await this.feedbackRepository
+          .createQueryBuilder('feedback')
+          .select('COUNT(*)', 'count')
+          .addSelect('AVG(feedback.rating)', 'averageRating')
+          .where('feedback.businessId = :userId', { userId })
+          .andWhere('feedback.isHidden = :isHidden', { isHidden: false })
+          .andWhere('feedback.createdAt BETWEEN :start AND :end', {
+            start: startOfDay,
+            end: endOfDay,
+          })
+          .getRawOne();
+
+        feedbackTrend.push({
+          date: startOfDay.toISOString().split('T')[0],
+          count: parseInt(result.count) || 0,
+          averageRating: parseFloat(result.averageRating) || 0,
+        });
+      }
     }
 
     return {
@@ -255,5 +303,23 @@ export class DashboardService {
       firstFeedback.unlockedAt = new Date();
       await this.achievementRepository.save(firstFeedback);
     }
+  }
+
+  async getStartupData(userId: string) {
+    const defaultPeriod = 'week';
+    const [summaryResult, chartResult, achievementsResult] = await Promise.all([
+      this.getSummary(userId),
+      this.getFeedbackChart(userId, defaultPeriod),
+      this.getAchievements(userId)
+    ]);
+
+    return {
+      success: true,
+      data: {
+        summary: summaryResult.data,
+        chart: chartResult.data,
+        achievements: achievementsResult.data
+      }
+    };
   }
 }

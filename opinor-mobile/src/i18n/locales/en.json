@@ -1,0 +1,398 @@
+{
+  "common": {
+    "error": "Error",
+    "error_title": "Something went wrong",
+    "error_desc": "We couldn't load your data. Please check your connection and try again.",
+    "retry": "Try Again",
+    "loading": "Loading..."
+  },
+  "tabs": {
+    "home": "Home",
+    "reports": "Reports",
+    "feedbacks": "Feedbacks",
+    "notifications": "Notifications",
+    "profile": "Profile"
+  },
+  "nav": {
+    "edit_profile": "Edit Profile",
+    "qr_code": "QR Code",
+    "business_info": "Business Info",
+    "change_password": "Change Password",
+    "language": "Language",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "support": "Help & Support",
+    "legal": "Legal & Policies"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "nav_title": "Login",
+      "email": "Email",
+      "email_placeholder": "Enter your email",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "forgot_password": "Forgot Password?",
+      "submit": "Login",
+      "or_continue": "Or continue with",
+      "google_login": "Continue with Google",
+      "no_account": "Don't have an account? ",
+      "signup_link": "Sign Up"
+    },
+    "signup": {
+      "step1_title": "Create Account",
+      "email_placeholder": "Enter your email address",
+      "email_continue": "Continue with email",
+      "google_continue": "Continue with Google",
+      "has_account": "Already have an account? ",
+      "login_link": "Login",
+      "step2_nav": "Sign up",
+      "step2_title": "Complete your account",
+      "name_label": "Full Name",
+      "name_placeholder": "Enter your full name",
+      "phone_label": "Phone number",
+      "phone_placeholder": "Enter your phone number",
+      "password_label": "Password",
+      "password_placeholder": "Create a strong password",
+      "confirm_label": "Confirm password",
+      "confirm_placeholder": "Repeat your password",
+      "create_btn": "Create account",
+      "step3_title": "Business details",
+      "business_label": "Business name",
+      "business_placeholder": "Enter your business name",
+      "industry_label": "Industry / Type",
+      "industry_placeholder": "Select a type",
+      "branch_count_label": "Branch count",
+      "branch_count_placeholder": "Select count",
+      "location_label": "Location / City",
+      "location_placeholder": "Casablanca, Morocco",
+      "confirm_btn": "Confirm",
+      "step4_title": "Enter your code",
+      "otp_label": "Code",
+      "verify_btn": "Verify",
+      "industries": {
+        "RESTAURANT": "Restaurant",
+        "BEACH": "Beach",
+        "CLINIC": "Clinic",
+        "CAFE": "Cafe",
+        "HOTEL": "Hotel",
+        "RETAIL": "Retail",
+        "OTHER": "Other"
+      },
+      "branch_counts": {
+        "1": "1",
+        "2_5": "2 - 5",
+        "5_10": "5 - 10",
+        "10_plus": "10+"
+      }
+    },
+    "forgot_password": {
+      "nav_title": "Forgot Password",
+      "title": "Password Reset",
+      "sent_msg": "If an account matches that email, a secure password reset link has been dispatched. Please check your inbox.",
+      "return_login": "Return to Login",
+      "instr": "Enter your registered email address and we will send you a secure link to reset your password.",
+      "email_label": "Email Address",
+      "email_placeholder": "Enter your email",
+      "send_btn": "Send Reset Link"
+    }
+  },
+  "booking": {
+    "form": {
+      "title": "Book a meeting",
+      "name_label": "Full Name",
+      "name_placeholder": "Enter your full name",
+      "email_label": "Email",
+      "email_placeholder": "Enter your email",
+      "phone_label": "Phone number",
+      "phone_placeholder": "Enter your phone number",
+      "note_label": "Additional note",
+      "note_placeholder": "...",
+      "submit_btn": "Book now"
+    },
+    "success": {
+      "title": "Thank you for booking your meeting!",
+      "subtitle": "You'll receive an email soon with your meeting link and details. We look forward to meeting you!",
+      "back_btn": "Back"
+    }
+  },
+  "onboarding": {
+    "slides": {
+      "slide1": {
+        "title": "Collect Feedback Instantly",
+        "subtitle": "Let your customers share their opinions in seconds through QR codes or links - quick, simple, and reliable."
+      },
+      "slide2": {
+        "title": "Understand What Matters",
+        "subtitle": "Visualize satisfaction trends, detect recurring issues, and track performance - all in one intuitive dashboard."
+      },
+      "slide3": {
+        "title": "Act Before Problems Go Public",
+        "subtitle": "Get alerts on negative feedbacks and resolve issues privately - strengthen trust and keep your brand shining."
+      }
+    }
+  },
+  "team_choice": {
+    "title": "Have you already met with our team?",
+    "subtitle": "If you've already discussed your business setup with us, you can go straight to creating your account.\nOtherwise, book a quick online meeting to help us tailor Opinor to your needs.",
+    "book_btn": "Book a Meeting",
+    "account_btn": "Continue to account creation",
+    "has_account": "Already have an account? ",
+    "login_link": "Login"
+  },
+  "dashboard": {
+    "greeting": "Good Morning",
+    "greetings": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening"
+    },
+    "satisfaction_score": "Average Satisfaction Score",
+    "received_feedbacks": "Received feedbacks",
+    "filters": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "days": {
+      "mon": "MON",
+      "tue": "TUE",
+      "wed": "WED",
+      "thu": "THU",
+      "fri": "FRI",
+      "sat": "SAT",
+      "sun": "SUN"
+    },
+    "empty": {
+      "title": "No Feedbacks Yet",
+      "subtitle": "Your customers' feedbacks will appear here once you start using your QR code.",
+      "action": "View and share our QR"
+    },
+    "last_achievements": "Last Achievements",
+    "stats": {
+      "positive_feedbacks": "Positive Feedbacks",
+      "negative_feedbacks": "Negative Feedbacks",
+      "response_rate": "Response Rate"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "tabs": {
+      "latest": "Latest",
+      "history": "History"
+    },
+    "periods": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month"
+    },
+    "kpis": {
+      "received": "Feedbacks Received",
+      "negative": "Negative Feedbacks",
+      "avg_rating": "Average Rating",
+      "growth": "vs Last month"
+    },
+    "charts": {
+      "rating_dist": "Rating Distribution",
+      "feedback_activity": "Feedback Activity"
+    },
+    "issues": {
+      "mentioned_in": "Mentioned in {{percent}}% of negative feedbacks",
+      "tags": {
+        "today": "ISSUE OF THE DAY",
+        "week": "ISSUE OF THE WEEK",
+        "month": "ISSUE OF THE MONTH"
+      }
+    },
+    "actions": {
+      "export": "Export Report"
+    },
+    "history": {
+      "feedbacks_count": "{{count}} feedbacks"
+    },
+    "export_error": "Failed to generate or share the report. Please try again."
+  },
+  "feedbacks": {
+    "title": "Feedbacks",
+    "filters": "Filters",
+    "count_received": "{{count}} received today",
+    "received_today": "received today",
+    "sort_by": "Sort By",
+    "sort_options": {
+      "newest": "Newest First",
+      "older": "Older First",
+      "read": "Read Notification",
+      "unread": "Unread Notification"
+    },
+    "actions": {
+      "apply": "Apply"
+    },
+    "types": {
+      "feedback_alert": "Feedback Alert",
+      "report_ready": "Report Ready",
+      "reminder": "Reminder"
+    }
+  },
+  "notifications_screen": {
+    "title": "Notifications",
+    "filters": "Filters",
+    "filters_all": "All",
+    "filters_unread": "Unread",
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "empty": {
+      "title": "No Notification Available At This Time",
+      "subtitle": "When you receive any notification, we will keep it here for you. Check back later for updates."
+    },
+    "sort_by": "Sort By",
+    "sort_options": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "read": "Read Notification",
+      "unread": "Unread Notification"
+    },
+    "actions": {
+      "apply": "Apply"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "groups": {
+      "profile": "Profile",
+      "security": "Security",
+      "general": "General",
+      "about": "About"
+    },
+    "items": {
+      "edit_profile": "Edit profile",
+      "qr_code": "QR code",
+      "business_info": "Business info",
+      "change_password": "Change password",
+      "languages": "Languages",
+      "appearance": "Appearance",
+      "notifications": "Notifications",
+      "clear_cache": "Clear Cache",
+      "help_support": "Help and support",
+      "legacies_policies": "Legacies and policies"
+    },
+    "actions": {
+      "logout": "Logout",
+      "delete_account": "Delete account",
+      "clear_cache_title": "Clear Cache",
+      "clear_cache_msg": "Are you sure you want to clear the application cache?",
+      "cancel": "Cancel",
+      "clear": "Clear"
+    }
+  },
+  "notifications": {
+    "push": "Push Notifications",
+    "email": "Email Reports",
+    "feedback_alert": "Feedback Alert",
+    "report_ready": "Report Ready",
+    "reminder": "Reminder"
+  },
+  "edit_profile": {
+    "title": "Edit Profile",
+    "update": "Update Profile",
+    "banner": "Your personal information is encrypted and securely stored.",
+    "labels": {
+      "name": "Name",
+      "phone": "Phone Number",
+      "email": "Email",
+      "company": "Company"
+    },
+    "placeholders": {
+      "name": "Enter your name",
+      "phone": "Enter your phone number",
+      "email": "Enter your email",
+      "company": "Enter your company name"
+    }
+  },
+  "change_password": {
+    "title": "Change Password",
+    "helper_text": "Your new password must be at least 8 characters long and differ from your previous password.",
+    "current_password": "Current Password",
+    "current_password_placeholder": "Enter current password",
+    "new_password": "New Password",
+    "new_password_placeholder": "Enter new password",
+    "confirm_password": "Confirm New Password",
+    "confirm_password_placeholder": "Re-enter new password",
+    "submit": "Update Password",
+    "too_short": "Password must be at least 8 characters",
+    "mismatch": "Passwords do not match"
+  },
+  "business_info": {
+    "title": "Business Info",
+    "change_logo": "Tap the badge to change logo",
+    "labels": {
+      "name": "Business Name",
+      "email": "Business Email",
+      "industry": "Industry",
+      "location": "Location",
+      "branches": "Branches"
+    },
+    "placeholders": {
+      "name": "Enter business name",
+      "email": "contact@business.com",
+      "industry": "Real Estate",
+      "location": "Casablanca, Morocco",
+      "branches": "1"
+    },
+    "submit": "Update Business Info"
+  },
+  "support": {
+    "title": "How can we help?",
+    "description": "Choose a method below to get in touch with our support team.",
+    "faq": {
+      "title": "FAQ & Knowledge Base",
+      "description": "Find quick answers to common questions."
+    },
+    "email": {
+      "title": "Email Support",
+      "description": "Send us an email. We usually reply within 24 hours."
+    }
+  },
+  "legal": {
+    "title": "Legacies and policies",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "dpa": "Data Processing Agreement"
+  },
+  "qr_code": {
+    "title": "Your QR Code",
+    "share": "Share Link",
+    "actions": {
+      "copy": "Copy Link",
+      "whatsapp": "WhatsApp",
+      "other": "Other Options"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "french": "French",
+    "arabic": "Arabic"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  }
+}

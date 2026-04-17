@@ -170,6 +170,7 @@ export class UsersService {
       data: {
         id: user.id,
         email: user.email,
+        phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName,
         businessName: user.businessName,

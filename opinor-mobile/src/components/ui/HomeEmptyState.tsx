@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { AppText } from './AppText';
 import { PrimaryButton } from './PrimaryButton';
 import { useTheme } from '../../theme/ThemeContext';
@@ -7,6 +8,7 @@ import { useTheme } from '../../theme/ThemeContext';
 export const HomeEmptyState = ({ onShowQR }: { onShowQR: () => void }) => {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
 
   // Explicit pixel widths — avoids alignSelf: stretch fighting with alignItems: center
   const illustrationSize = width * 0.65;
@@ -42,7 +44,7 @@ export const HomeEmptyState = ({ onShowQR }: { onShowQR: () => void }) => {
       {/* ── Text cluster ── */}
       <View style={styles.textBlock}>
         <AppText weight="bold" style={styles.title}>
-          No Feedbacks Yet
+          {t('dashboard.empty.title')}
         </AppText>
 
         <AppText
@@ -50,13 +52,13 @@ export const HomeEmptyState = ({ onShowQR }: { onShowQR: () => void }) => {
           colorToken="#6B7280"
           style={styles.subtitle}
         >
-          Your customers' feedbacks will appear here once you start using your QR code.
+          {t('dashboard.empty.subtitle')}
         </AppText>
       </View>
 
       {/* ── CTA pill — explicit pixel width, no alignSelf: stretch ── */}
       <PrimaryButton
-        label="View and share our QR"
+        label={t('dashboard.empty.action')}
         onPress={onShowQR}
         style={[styles.button, { width: buttonWidth }]}
       />

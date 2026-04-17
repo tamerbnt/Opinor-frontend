@@ -45,4 +45,14 @@ export class FeedbackQueryDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort direction (ASC or DESC)',
+    enum: ['ASC', 'DESC'],
+    default: 'DESC',
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['ASC', 'DESC'])
+  sortDir?: 'ASC' | 'DESC' = 'DESC';
 }

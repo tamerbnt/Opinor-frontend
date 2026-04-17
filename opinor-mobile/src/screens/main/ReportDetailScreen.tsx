@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MessageCircle, ThumbsDown, Star, TrendingUp, ChevronLeft } from 'lucide-react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { AppText } from '../../components/ui/AppText';
 import { useTheme } from '../../theme/ThemeContext';
 import { ReportsStackParamList } from '../../navigation/ReportsNavigator';
@@ -102,7 +103,7 @@ const MiniDonut = ({ percent, size = 60 }: { percent: number; size?: number }) =
   );
 };
 
-// StyleSheets for KPIBadge and main screen — defined BEFORE the components that use them
+// StyleSheets for KPIBadge and main screen
 const badge = StyleSheet.create({
   card:   { flex: 1, borderRadius: 10, padding: 12, alignItems: 'center' },
   circle: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
@@ -143,16 +144,20 @@ const KPIBadge = ({
 // ─── Report Detail Screen ─────────────────────────────────────────────────────
 export const ReportDetailScreen = ({ route, navigation }: Props) => {
   const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const report = route.params;
 
-  // Same color tokens as ReportsScreen
   const cardBg     = isDark ? '#1E2227' : '#F7F7F8';
   const screenBg   = isDark ? colors.dark : colors.white;
   const trackColor = isDark ? '#2A2D31' : '#E5E7EB';
   const titleColor = isDark ? '#FFFFFF' : '#111827';
-  const numColor   = isDark ? '#FFFFFF' : '#111827';  // ← fix: was always #FFFFFF
-  const barColor   = isDark ? '#42D599' : '#038788';  // ← theme-aware bar color
+  const numColor   = isDark ? '#FFFFFF' : '#111827';
+  const barColor   = isDark ? '#42D599' : '#038788';
+
+  // Translate month if possible
+  const monthKey = report.month.toLowerCase();
+  const translatedMonth = t(`months.${monthKey}`, { defaultValue: report.month });
 
   return (
     <View style={[s.container, { backgroundColor: screenBg }]}>
@@ -163,7 +168,7 @@ export const ReportDetailScreen = ({ route, navigation }: Props) => {
           <ChevronLeft size={24} color={colors.blue} strokeWidth={2.5} />
         </TouchableOpacity>
         <AppText weight="bold" style={[s.headerTitle, { color: titleColor }]}>
-          {report.month} Report
+          {translatedMonth} {t('reports.title')}
         </AppText>
         <View style={{ width: 40 }} />
       </View>
@@ -172,25 +177,23 @@ export const ReportDetailScreen = ({ route, navigation }: Props) => {
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── 1×4 Compact KPI badge row — gap: 8px, same bg as cards ── */}
         <View style={[s.badgeRow]}>
           <KPIBadge icon={MessageCircle} iconBg="#22C55E"
-            value={String(report.total)} label={`Feedbacks\nReceived`}
+            value={String(report.total)} label={t('reports.kpis.received').replace(' ', '\n')}
             cardBg={cardBg} numColor={numColor} />
           <KPIBadge icon={ThumbsDown} iconBg="#F87171"
-            value={String(report.negative)} label={`Negative\nFeedbacks`}
+            value={String(report.negative)} label={t('reports.kpis.negative').replace(' ', '\n')}
             cardBg={cardBg} numColor={numColor} />
           <KPIBadge icon={Star} iconBg="#93C5FD"
-            value={report.avgRating} label={`Average\nRating`}
+            value={report.avgRating} label={t('reports.kpis.avg_rating').replace(' ', '\n')}
             cardBg={cardBg} numColor={numColor} />
           <KPIBadge icon={TrendingUp} iconBg="#C084FC" iconColor="#1F2937"
-            value={report.growth} label={`vs Last\nMonth`}
+            value={report.growth} label={t('reports.kpis.growth').replace('vs Last ', 'vs\n')}
             cardBg={cardBg} numColor={numColor} />
         </View>
 
-        {/* ── Rating Distribution — 12px × 157px ── */}
         <AppText weight="semiBold" style={[s.sectionTitle, { color: titleColor }]}>
-          Rating Distribution
+          {t('reports.charts.rating_dist')}
         </AppText>
         <View style={[s.chartCard, { backgroundColor: cardBg }]}>
           <VerticalBarChart
@@ -203,9 +206,8 @@ export const ReportDetailScreen = ({ route, navigation }: Props) => {
           />
         </View>
 
-        {/* ── Feedback Activity — 24px × 170px ── */}
         <AppText weight="semiBold" style={[s.sectionTitle, { color: titleColor }]}>
-          Feedback Activity
+          {t('reports.charts.feedback_activity')}
         </AppText>
         <View style={[s.chartCard, { backgroundColor: cardBg }]}>
           <VerticalBarChart
@@ -218,27 +220,23 @@ export const ReportDetailScreen = ({ route, navigation }: Props) => {
           />
         </View>
 
-        {/* ── Issue Card ── */}
         <View style={s.issueCard}>
           <View style={{ flex: 1 }}>
-            <AppText style={s.issueTag}>ISSUE OF THE MONTH</AppText>
+            <AppText style={s.issueTag}>{t('reports.issues.tags.month')}</AppText>
             <AppText weight="bold" style={s.issueTitle}>{report.issue}</AppText>
             <AppText style={s.issueSub}>
-              Mentioned in {report.issuePercent}% of negative feedbacks
+              {t('reports.issues.mentioned_in', { percent: report.issuePercent })}
             </AppText>
           </View>
           <MiniDonut percent={report.issuePercent} />
         </View>
 
-        {/* ── Export Report ── */}
         <TouchableOpacity style={[s.exportBtn, { backgroundColor: barColor }]} activeOpacity={0.85}>
           <AppText weight="semiBold" style={[s.exportLabel, { color: isDark ? '#111827' : '#FFFFFF' }]}>
-            Export Report
+            {t('reports.actions.export')}
           </AppText>
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
-
-// s StyleSheet moved to top-of-file — see above

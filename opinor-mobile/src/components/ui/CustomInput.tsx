@@ -46,7 +46,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           style={[
             styles.input,
             {
-              color: isDark ? colors.white : '#1A1D21',
+              color: colors.text,
             },
             style,
           ]}

@@ -78,6 +78,57 @@ export class ReportsService {
           ).toFixed(1)
         : '0';
 
+    // 1. Calculate Top Negative Issue
+    const negativeFeedbacks = feedbacks.filter((f) => parseFloat(f.rating.toString()) < 3);
+    let issue = 'No Issues';
+    let maxIssueCount = 0;
+
+    if (negativeFeedbacks.length > 0) {
+      const issueMap = new Map<string, number>();
+      for (const nf of negativeFeedbacks) {
+        const cat = nf.category || 'Other';
+        const currentCount = (issueMap.get(cat) || 0) + 1;
+        issueMap.set(cat, currentCount);
+        if (currentCount > maxIssueCount) {
+          maxIssueCount = currentCount;
+          issue = cat;
+        }
+      }
+    }
+    const issuePercent = negativeFeedbacks.length > 0 
+      ? Math.round((maxIssueCount / negativeFeedbacks.length) * 100) 
+      : 0;
+
+    // 2. Calculate Activity Trends
+    let activity: number[] | undefined;
+    let activityLabels: string[] | undefined;
+
+    if (period === 'week') {
+      activity = [];
+      activityLabels = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dayCount = feedbacks.filter(f => {
+          const fDate = new Date(f.createdAt);
+          return fDate.getFullYear() === d.getFullYear() && fDate.getMonth() === d.getMonth() && fDate.getDate() === d.getDate();
+        }).length;
+        activity.push(dayCount);
+        // Short weekday name (e.g. 'Mon', 'Tue')
+        activityLabels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+      }
+    } else if (period === 'month') {
+      const weekCounts = [0, 0, 0, 0];
+      for (const f of feedbacks) {
+         const fDate = new Date(f.createdAt);
+         const dayOfMonth = fDate.getDate(); // 1-31
+         const weekIdx = Math.min(Math.floor((dayOfMonth - 1) / 7), 3); // bucket into 0..3
+         weekCounts[weekIdx]++;
+      }
+      activity = weekCounts;
+      activityLabels = ['W1', 'W2', 'W3', 'W4'];
+    }
+
     return {
       success: true,
       data: {
@@ -90,6 +141,10 @@ export class ReportsService {
           averageRating: parseFloat(avgRating.toFixed(1)),
           ratingOutOf5: `${avgRating.toFixed(1)} / 5`,
           trend: `${parseFloat(trend) >= 0 ? '+' : ''}${trend}%`,
+          issue,
+          issuePercent,
+          activity,
+          activityLabels,
         },
       },
     };

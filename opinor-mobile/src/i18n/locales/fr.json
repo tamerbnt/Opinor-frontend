@@ -1,0 +1,398 @@
+{
+  "common": {
+    "error": "Erreur",
+    "error_title": "Une erreur est survenue",
+    "error_desc": "Nous n'avons pas pu charger vos données. Veuillez vérifier votre connexion et réessayer.",
+    "retry": "Réessayer",
+    "loading": "Chargement..."
+  },
+  "tabs": {
+    "home": "Accueil",
+    "reports": "Rapports",
+    "feedbacks": "Avis",
+    "notifications": "Notifications",
+    "profile": "Profil"
+  },
+  "nav": {
+    "edit_profile": "Modifier le profil",
+    "qr_code": "Code QR",
+    "business_info": "Infos professionnelles",
+    "change_password": "Changer le mot de passe",
+    "language": "Langue",
+    "appearance": "Apparence",
+    "notifications": "Notifications",
+    "support": "Aide et assistance",
+    "legal": "Politiques et conditions"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "nav_title": "Connexion",
+      "email": "E-mail",
+      "email_placeholder": "Entrez votre e-mail",
+      "password": "Mot de passe",
+      "password_placeholder": "Entrez votre mot de passe",
+      "forgot_password": "Mot de passe oublié ?",
+      "submit": "Démarrer",
+      "or_continue": "Ou continuer avec",
+      "google_login": "Continuer avec Google",
+      "no_account": "Vous n'avez pas de compte ? ",
+      "signup_link": "S'inscrire"
+    },
+    "signup": {
+      "step1_title": "Créer un compte",
+      "email_placeholder": "Entrez votre adresse e-mail",
+      "email_continue": "Continuer avec l'e-mail",
+      "google_continue": "Continuer avec Google",
+      "has_account": "Vous avez déjà un compte ? ",
+      "login_link": "Connexion",
+      "step2_nav": "S'inscrire",
+      "step2_title": "Complétez votre compte",
+      "name_label": "Nom complet",
+      "name_placeholder": "Entrez votre nom complet",
+      "phone_label": "Numéro de téléphone",
+      "phone_placeholder": "Entrez votre numéro de téléphone",
+      "password_label": "Mot de passe",
+      "password_placeholder": "Créez un mot de passe fort",
+      "confirm_label": "Confirmer le mot de passe",
+      "confirm_placeholder": "Répétez votre mot de passe",
+      "create_btn": "Créer un compte",
+      "step3_title": "Détails de l'entreprise",
+      "business_label": "Nom de l'entreprise",
+      "business_placeholder": "Entrez le nom de l'entreprise",
+      "industry_label": "Industrie / Type",
+      "industry_placeholder": "Sélectionnez un type",
+      "branch_count_label": "Nombre de succursales",
+      "branch_count_placeholder": "Sélectionnez le nombre",
+      "location_label": "Lieu / Ville",
+      "location_placeholder": "Casablanca, Maroc",
+      "confirm_btn": "Confirmer",
+      "step4_title": "Entrez votre code",
+      "otp_label": "Code",
+      "verify_btn": "Vérifier",
+      "industries": {
+        "RESTAURANT": "Restaurant",
+        "BEACH": "Plage",
+        "CLINIC": "Clinique",
+        "CAFE": "Café",
+        "HOTEL": "Hôtel",
+        "RETAIL": "Commerce",
+        "OTHER": "Autre"
+      },
+      "branch_counts": {
+        "1": "1",
+        "2_5": "2 - 5",
+        "5_10": "5 - 10",
+        "10_plus": "10+"
+      }
+    },
+    "forgot_password": {
+      "nav_title": "Mot de passe oublié",
+      "title": "Réinitialisation du mot de passe",
+      "sent_msg": "Si un compte correspond à cet e-mail, un lien de réinitialisation sécurisé a été envoyé. Veuillez vérifier votre boîte de réception.",
+      "return_login": "Retour à la connexion",
+      "instr": "Entrez votre adresse e-mail enregistrée et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.",
+      "email_label": "Adresse e-mail",
+      "email_placeholder": "Entrez votre e-mail",
+      "send_btn": "Envoyer le lien"
+    }
+  },
+  "booking": {
+    "form": {
+      "title": "Réserver une réunion",
+      "name_label": "Nom complet",
+      "name_placeholder": "Entrez votre nom complet",
+      "email_label": "E-mail",
+      "email_placeholder": "Entrez votre e-mail",
+      "phone_label": "Numéro de téléphone",
+      "phone_placeholder": "Entrez votre numéro de téléphone",
+      "note_label": "Note supplémentaire",
+      "note_placeholder": "...",
+      "submit_btn": "Réserver maintenant"
+    },
+    "success": {
+      "title": "Merci d'avoir réservé votre réunion !",
+      "subtitle": "Vous recevrez bientôt un e-mail avec le lien et les détails de votre réunion. Nous avons hâte de vous rencontrer !",
+      "back_btn": "Retour"
+    }
+  },
+  "onboarding": {
+    "slides": {
+      "slide1": {
+        "title": "Collectez les avis instantanément",
+        "subtitle": "Laissez vos clients partager leurs opinions en quelques secondes via des codes QR ou des liens - rapide, simple et fiable."
+      },
+      "slide2": {
+        "title": "Comprenez ce qui compte",
+        "subtitle": "Visualisez les tendances de satisfaction, détectez les problèmes récurrents et suivez les performances - le tout dans un tableau de bord intuitif."
+      },
+      "slide3": {
+        "title": "Agissez avant que les problèmes ne deviennent publics",
+        "subtitle": "Recevez des alertes sur les avis négatifs et résolvez les problèmes en privé - renforcez la confiance et gardez votre marque éclatante."
+      }
+    }
+  },
+  "team_choice": {
+    "title": "Avez-vous déjà rencontré notre équipe ?",
+    "subtitle": "Si vous avez déjà discuté de la configuration de votre entreprise avec nous, vous pouvez passer directement à la création de votre compte.\nSinon, réservez une réunion rapide en ligne pour nous aider à adapter Opinor à vos besoins.",
+    "book_btn": "Réserver une réunion",
+    "account_btn": "Continuer vers la création de compte",
+    "has_account": "Vous avez déjà un compte ? ",
+    "login_link": "Connexion"
+  },
+  "dashboard": {
+    "greeting": "Bonjour",
+    "greetings": {
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir"
+    },
+    "satisfaction_score": "Score de satisfaction moyen",
+    "received_feedbacks": "Avis reçus",
+    "filters": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "days": {
+      "mon": "LUN",
+      "tue": "MAR",
+      "wed": "MER",
+      "thu": "JEU",
+      "fri": "VEN",
+      "sat": "SAM",
+      "sun": "DIM"
+    },
+    "empty": {
+      "title": "Aucun avis pour l'instant",
+      "subtitle": "Les avis de vos clients apparaîtront ici une fois que vous aurez commencé à utiliser votre code QR.",
+      "action": "Voir et partager notre QR"
+    },
+    "last_achievements": "Dernières Réussites",
+    "stats": {
+      "positive_feedbacks": "Avis Positifs",
+      "negative_feedbacks": "Avis Négatifs",
+      "response_rate": "Taux de Réponse"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "tabs": {
+      "latest": "Dernier",
+      "history": "Historique"
+    },
+    "periods": {
+      "today": "Aujourd'hui",
+      "week": "Cette semaine",
+      "month": "Ce mois"
+    },
+    "kpis": {
+      "received": "Avis reçus",
+      "negative": "Avis négatifs",
+      "avg_rating": "Note moyenne",
+      "growth": "par rapport au mois dernier"
+    },
+    "charts": {
+      "rating_dist": "Répartition des notes",
+      "feedback_activity": "Activité des avis"
+    },
+    "issues": {
+      "mentioned_in": "Mentionné dans {{percent}}% des avis négatifs",
+      "tags": {
+        "today": "PROBLÈME DU JOUR",
+        "week": "PROBLÈME DE LA SEMAINE",
+        "month": "PROBLÈME DU MOIS"
+      }
+    },
+    "actions": {
+      "export": "Exporter le rapport"
+    },
+    "history": {
+      "feedbacks_count": "{{count}} avis"
+    },
+    "export_error": "Échec de la génération ou du partage du rapport. Veuillez réessayer."
+  },
+  "feedbacks": {
+    "title": "Avis",
+    "filters": "Filtres",
+    "count_received": "{{count}} reçus aujourd'hui",
+    "received_today": "reçus aujourd'hui",
+    "sort_by": "Trier par",
+    "sort_options": {
+      "newest": "Le plus récent",
+      "older": "Le plus ancien",
+      "read": "Notification lue",
+      "unread": "Notification non lue"
+    },
+    "actions": {
+      "apply": "Appliquer"
+    },
+    "types": {
+      "feedback_alert": "Alerte d'avis",
+      "report_ready": "Rapport prêt",
+      "reminder": "Rappel"
+    }
+  },
+  "notifications_screen": {
+    "title": "Notifications",
+    "filters": "Filtres",
+    "filters_all": "Tout",
+    "filters_unread": "Non lu",
+    "groups": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier"
+    },
+    "empty": {
+      "title": "Aucune notification disponible pour le moment",
+      "subtitle": "Lorsque vous recevrez une notification, nous la garderons ici pour vous. Revenez plus tard pour les mises à jour."
+    },
+    "sort_by": "Trier par",
+    "sort_options": {
+      "newest": "Le plus récent",
+      "oldest": "Le plus ancien",
+      "read": "Notification lue",
+      "unread": "Notification non lue"
+    },
+    "actions": {
+      "apply": "Appliquer"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "groups": {
+      "profile": "Profil",
+      "security": "Sécurité",
+      "general": "Général",
+      "about": "À propos"
+    },
+    "items": {
+      "edit_profile": "Modifier le profil",
+      "qr_code": "Code QR",
+      "business_info": "Infos professionnelles",
+      "change_password": "Changer le mot de passe",
+      "languages": "Langues",
+      "appearance": "Apparence",
+      "notifications": "Notifications",
+      "clear_cache": "Vider le cache",
+      "help_support": "Aide et assistance",
+      "legacies_policies": "Politiques et conditions"
+    },
+    "actions": {
+      "logout": "Déconnexion",
+      "delete_account": "Supprimer le compte",
+      "clear_cache_title": "Vider le cache",
+      "clear_cache_msg": "Êtes-vous sûr de vouloir vider le cache de l'application ?",
+      "cancel": "Annuler",
+      "clear": "Vider"
+    }
+  },
+  "notifications": {
+    "push": "Notifications Push",
+    "email": "Rapports par e-mail",
+    "feedback_alert": "Alerte d'avis",
+    "report_ready": "Rapport prêt",
+    "reminder": "Rappel"
+  },
+  "edit_profile": {
+    "title": "Modifier le profil",
+    "update": "Mettre à jour le profil",
+    "banner": "Vos informations personnelles sont cryptées et stockées en toute sécurité.",
+    "labels": {
+      "name": "Nom",
+      "phone": "Numéro de téléphone",
+      "email": "E-mail",
+      "company": "Entreprise"
+    },
+    "placeholders": {
+      "name": "Entrez votre nom",
+      "phone": "Entrez votre numéro de téléphone",
+      "email": "Entrez votre e-mail",
+      "company": "Entrez le nom de votre entreprise"
+    }
+  },
+  "change_password": {
+    "title": "Changer le mot de passe",
+    "helper_text": "Votre nouveau mot de passe doit comporter au moins 8 caractères et différer de votre mot de passe précédent.",
+    "current_password": "Mot de passe actuel",
+    "current_password_placeholder": "Entrez le mot de passe actuel",
+    "new_password": "Nouveau mot de passe",
+    "new_password_placeholder": "Entrez le nouveau mot de passe",
+    "confirm_password": "Confirmer le nouveau mot de passe",
+    "confirm_password_placeholder": "Ré-entrez le nouveau mot de passe",
+    "submit": "Mettre à jour le mot de passe",
+    "too_short": "Le mot de passe doit comporter au moins 8 caractères",
+    "mismatch": "Les mots de passe ne correspondent pas"
+  },
+  "business_info": {
+    "title": "Infos professionnelles",
+    "change_logo": "Appuyez sur le badge pour changer le logo",
+    "labels": {
+      "name": "Nom de l'entreprise",
+      "email": "E-mail de l'entreprise",
+      "industry": "Secteur",
+      "location": "Emplacement",
+      "branches": "Succursales"
+    },
+    "placeholders": {
+      "name": "Entrez le nom de l'entreprise",
+      "email": "contact@entreprise.com",
+      "industry": "Immobilier",
+      "location": "Casablanca, Maroc",
+      "branches": "1"
+    },
+    "submit": "Mettre à jour les infos"
+  },
+  "support": {
+    "title": "Comment pouvons-nous vous aider ?",
+    "description": "Choisissez une méthode ci-dessous pour contacter notre équipe d'assistance.",
+    "faq": {
+      "title": "FAQ et base de connaissances",
+      "description": "Trouvez des réponses rapides aux questions courantes."
+    },
+    "email": {
+      "title": "Support par e-mail",
+      "description": "Envoyez-nous un e-mail. Nous répondons généralement sous 24 heures."
+    }
+  },
+  "legal": {
+    "title": "Politiques et conditions",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "cookies": "Politique relative aux cookies",
+    "dpa": "Accord de traitement des données"
+  },
+  "qr_code": {
+    "title": "Votre code QR",
+    "share": "Partager le lien",
+    "actions": {
+      "copy": "Copier le lien",
+      "whatsapp": "WhatsApp",
+      "other": "Autres options"
+    }
+  },
+  "language": {
+    "title": "Langue",
+    "english": "Anglais",
+    "french": "Français",
+    "arabic": "Arabe"
+  },
+  "appearance": {
+    "title": "Apparence",
+    "light": "Mode Clair",
+    "dark": "Mode Sombre"
+  },
+  "months": {
+    "january": "Janvier",
+    "february": "Février",
+    "march": "Mars",
+    "april": "Avril",
+    "may": "Mai",
+    "june": "Juin",
+    "july": "Juillet",
+    "august": "Août",
+    "september": "Septembre",
+    "october": "Octobre",
+    "november": "Novembre",
+    "december": "Décembre"
+  }
+}

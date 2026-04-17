@@ -3,10 +3,12 @@ import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Image, StatusB
 import { AppText } from '../../components/ui/AppText';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export const TeamChoiceScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
   const containerWidth = width > 500 ? 390 : width;
 
   return (
@@ -25,18 +27,17 @@ export const TeamChoiceScreen = ({ navigation }: any) => {
 
         <View style={styles.content}>
           <AppText variant="h2" weight="bold" colorToken={colors.dark} style={styles.title}>
-            Have you already met with our team?
+            {t('team_choice.title')}
           </AppText>
           
           <AppText variant="body" style={styles.subtitle}>
-            If you've already discussed your business setup with us, you can go straight to creating your account.{"\n"}
-            Otherwise, book a quick online meeting to help us tailor Opinor to your needs.
+            {t('team_choice.subtitle')}
           </AppText>
         </View>
 
         <View style={styles.footer}>
           <PrimaryButton 
-            label="Book a Meeting" 
+            label={t('team_choice.book_btn')} 
             onPress={() => navigation.navigate('BookingForm')} 
             style={styles.button}
           />
@@ -45,7 +46,7 @@ export const TeamChoiceScreen = ({ navigation }: any) => {
             onPress={() => navigation.navigate('Signup')}
             style={[styles.outlineButton, { borderColor: colors.blue }]}
           >
-            <AppText weight="semiBold" colorToken={colors.blue}>Continue to account creation</AppText>
+            <AppText weight="semiBold" colorToken={colors.blue}>{t('team_choice.account_btn')}</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -53,7 +54,7 @@ export const TeamChoiceScreen = ({ navigation }: any) => {
             style={styles.loginLink}
           >
             <AppText variant="caption">
-              Already have an account? <AppText variant="caption" weight="bold" colorToken={colors.blue}>Login</AppText>
+              {t('team_choice.has_account')} <AppText variant="caption" weight="bold" colorToken={colors.blue}>{t('team_choice.login_link')}</AppText>
             </AppText>
           </TouchableOpacity>
         </View>

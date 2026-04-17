@@ -44,6 +44,18 @@ export class NotificationsController {
     type: Number,
     description: 'Items per page (default: 20)',
   })
+  @ApiQuery({
+    name: 'sortDir',
+    required: false,
+    type: String,
+    description: 'Sort direction (ASC or DESC)',
+  })
+  @ApiQuery({
+    name: 'isRead',
+    required: false,
+    type: Boolean,
+    description: 'Filter by read status',
+  })
   @ApiOkResponse({
     description: 'List of notifications',
     schema: {
@@ -75,8 +87,20 @@ export class NotificationsController {
     @CurrentUser() user: User,
     @Query('page') page = 1,
     @Query('limit') limit = 20,
+    @Query('sortDir') sortDir: 'ASC' | 'DESC' = 'DESC',
+    @Query('isRead') isRead?: string,
   ) {
-    return this.notificationsService.getNotifications(user.id, +page, +limit);
+    let isReadBool: boolean | undefined;
+    if (isRead === 'true' || isRead === true as unknown) isReadBool = true;
+    else if (isRead === 'false' || isRead === false as unknown) isReadBool = false;
+
+    return this.notificationsService.getNotifications(
+      user.id,
+      +page,
+      +limit,
+      sortDir,
+      isReadBool
+    );
   }
 
   @Get('unread-count')

@@ -3,10 +3,12 @@ import { View, StyleSheet, useWindowDimensions, Image, StatusBar, TouchableOpaci
 import { AppText } from '../../components/ui/AppText';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export const BookingSuccessScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
   const containerWidth = width > 500 ? 390 : width;
 
   return (
@@ -24,17 +26,17 @@ export const BookingSuccessScreen = ({ navigation }: any) => {
 
         <View style={styles.content}>
           <AppText variant="h2" weight="bold" colorToken={colors.dark} style={styles.title}>
-            Thank you for booking your meeting!
+            {t('booking.success.title')}
           </AppText>
           
           <AppText variant="body" style={styles.subtitle}>
-            You'll receive an email soon with your meeting link and details. We look forward to meeting you!
+            {t('booking.success.subtitle')}
           </AppText>
         </View>
 
         <View style={styles.footer}>
           <PrimaryButton 
-            label="back" 
+            label={t('booking.success.back_btn')} 
             onPress={() => navigation.navigate('TeamChoice')} 
             style={styles.button}
           />
@@ -44,7 +46,7 @@ export const BookingSuccessScreen = ({ navigation }: any) => {
             style={styles.loginLink}
           >
             <AppText variant="caption">
-              Already have an account? <AppText variant="caption" weight="bold" colorToken={colors.blue}>Login</AppText>
+              {t('booking.form.has_account')} <AppText variant="caption" weight="bold" colorToken={colors.blue}>{t('booking.form.login_link')}</AppText>
             </AppText>
           </TouchableOpacity>
         </View>

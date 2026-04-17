@@ -2,11 +2,13 @@ import React, { useState, useRef } from 'react';
 import { View, StyleSheet, ScrollView, useWindowDimensions, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { AppText } from '../../components/ui/AppText';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react-native';
 
 export const OnboardingScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -22,8 +24,8 @@ export const OnboardingScreen = ({ navigation }: any) => {
   
   const slides = [
     {
-      title: "Collect Feedback Instantly",
-      subtitle: "Let your customers share their opinions in seconds through QR codes or links - quick, simple, and reliable.",
+      title: t('onboarding.slides.slide1.title'),
+      subtitle: t('onboarding.slides.slide1.subtitle'),
       illustration: require('../../../assets/onboard 1 x3.png'),
       vector: require('../../../assets/Vector 1 x3.png'),
       vectorTop: 415,
@@ -32,8 +34,8 @@ export const OnboardingScreen = ({ navigation }: any) => {
       illuH: 255,
     },
     {
-      title: "Understand What Matters",
-      subtitle: "Visualize satisfaction trends, detect recurring issues, and track performance - all in one intuitive dashboard.",
+      title: t('onboarding.slides.slide2.title'),
+      subtitle: t('onboarding.slides.slide2.subtitle'),
       illustration: require('../../../assets/oboard 2 x3.png'),
       vector: require('../../../assets/Vector 2 x3.png'),
       vectorTop: 478.57,
@@ -42,8 +44,8 @@ export const OnboardingScreen = ({ navigation }: any) => {
       illuH: 300,
     },
     {
-      title: "Act Before Problems Go Public",
-      subtitle: "Get alerts on negative feedbacks and resolve issues privately - strengthen trust and keep your brand shining.",
+      title: t('onboarding.slides.slide3.title'),
+      subtitle: t('onboarding.slides.slide3.subtitle'),
       illustration: require('../../../assets/onboard 3 x3.png'),
       vector: require('../../../assets/Vector 3 x3.png'),
       vectorTop: 415,

@@ -4,11 +4,13 @@ import { AppText } from '../../components/ui/AppText';
 import { CustomInput } from '../../components/ui/CustomInput';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { useTheme } from '../../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react-native';
 
 export const ForgotPasswordScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
   const containerWidth = width > 500 ? 390 : width;
   
   const [email, setEmail] = useState('');
@@ -39,20 +41,20 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <ArrowLeft color={colors.dark} size={24} />
             </TouchableOpacity>
-            <AppText weight="semiBold" style={styles.navTitle}>Forgot Password</AppText>
+            <AppText weight="semiBold" style={styles.navTitle}>{t('auth.forgot_password.nav_title')}</AppText>
             <View style={{ width: 24 }} />
           </View>
 
           <View style={styles.header}>
-            <AppText variant="h1" weight="bold" style={styles.title}>Password Reset</AppText>
+            <AppText variant="h1" weight="bold" style={styles.title}>{t('auth.forgot_password.title')}</AppText>
             
             {sent ? (
               <View style={styles.successBox}>
                 <AppText variant="body" style={styles.subtitle}>
-                  If an account matches that email, a secure password reset link has been dispatched. Please check your inbox.
+                  {t('auth.forgot_password.sent_msg')}
                 </AppText>
                 <PrimaryButton 
-                  label="Return to Login" 
+                  label={t('auth.forgot_password.return_login')} 
                   onPress={() => navigation.navigate('Login')} 
                   style={styles.submitBtn} 
                 />
@@ -60,12 +62,12 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
             ) : (
               <>
                 <AppText variant="body" style={styles.subtitle}>
-                  Enter your registered email address and we will send you a secure link to reset your password.
+                  {t('auth.forgot_password.instr')}
                 </AppText>
 
                 <CustomInput
-                  label="Email Address"
-                  placeholder="Enter your email"
+                  label={t('auth.forgot_password.email_label')}
+                  placeholder={t('auth.forgot_password.email_placeholder')}
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -73,7 +75,7 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
                 />
 
                 <PrimaryButton 
-                  label="Send Reset Link" 
+                  label={t('auth.forgot_password.send_btn')} 
                   onPress={handleReset} 
                   loading={isLoading} 
                   style={styles.submitBtn} 

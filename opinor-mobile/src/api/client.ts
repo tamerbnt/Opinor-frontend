@@ -1,9 +1,12 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useAuthStore } from '../store/useAuthStore';
 
-// Assuming the NestJS backend runs locally. Use localhost for iOS, 10.0.2.2 for Android.
-export const API_URL = 'http://10.0.2.2:3000/api/v1';
+// Platform-aware base URL: Android emulator uses 10.0.2.2, iOS uses localhost.
+// In production, set EXPO_PUBLIC_API_URL in your environment / EAS secrets.
+const DEV_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? `http://${DEV_HOST}:3000/api/v1`;
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -33,16 +36,16 @@ apiClient.interceptors.response.use(
         const refreshToken = await SecureStore.getItemAsync('refreshToken');
         if (!refreshToken) throw new Error('No refresh token available');
 
-        // Request new tokens directly via axios to avoid interceptor loop
-        const res = await axios.post(`${API_URL}/auth/refresh`, {}, {
-          headers: { Authorization: `Bearer ${refreshToken}` } // or via body depending on API
-        });
-        
-        const newAccessToken = res.data.access_token;
-        const newRefreshToken = res.data.refresh_token;
+        // Backend expects { refreshToken } in the request body (RefreshTokenDto)
+        // Do NOT send it as an Authorization header — that is ignored by the backend.
+        const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
 
-        if(newAccessToken) await SecureStore.setItemAsync('accessToken', newAccessToken);
-        if(newRefreshToken) await SecureStore.setItemAsync('refreshToken', newRefreshToken);
+        // Backend generateTokens() returns camelCase: { accessToken, refreshToken }
+        const newAccessToken = res.data.accessToken;
+        const newRefreshToken = res.data.refreshToken;
+
+        if (newAccessToken) await SecureStore.setItemAsync('accessToken', newAccessToken);
+        if (newRefreshToken) await SecureStore.setItemAsync('refreshToken', newRefreshToken);
 
         // Sync Zustand store
         useAuthStore.getState().signIn(newAccessToken, useAuthStore.getState().userProfile);
@@ -50,7 +53,7 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, force logout
+        // Refresh failed — force logout
         useAuthStore.getState().signOut();
         return Promise.reject(refreshError);
       }
