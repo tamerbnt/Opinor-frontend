@@ -1,5 +1,4 @@
 module.exports = function(api) {
-  api.cache(true);
   const isProd = api.env('production');
   const plugins = [
     'react-native-worklets/plugin',
