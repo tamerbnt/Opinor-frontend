@@ -19,7 +19,7 @@ export const TeamChoiceScreen = ({ navigation }: any) => {
         {/* Top Vertical Branding Section */}
         <View style={styles.header}>
           <Image 
-            source={require('../../../assets/white vertical 2 (2).png')} 
+            source={require('../../../assets/new_logo.png')} 
             style={styles.logo}
             resizeMode="contain"
           />

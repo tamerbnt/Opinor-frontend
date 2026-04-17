@@ -63,6 +63,9 @@ export class User {
   @Column({ nullable: true })
   address: string;
 
+  @Column({ name: 'branch_count', nullable: true })
+  branchCount: string;
+
   @Column({ name: 'unique_code', unique: true })
   uniqueCode: string;
 

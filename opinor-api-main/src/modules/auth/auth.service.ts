@@ -149,8 +149,11 @@ export class AuthService {
       password: registerDto.password,
       businessName: joinRequest.businessName,
       businessType: joinRequest.businessType,
+      firstName: joinRequest.firstName,
+      lastName: joinRequest.lastName,
       phone: joinRequest.phone,
       address: joinRequest.address,
+      branchCount: joinRequest.branchCount,
     });
 
     // Mark the code as used

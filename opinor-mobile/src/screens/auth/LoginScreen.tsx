@@ -11,11 +11,15 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { getStartupData } from '../../api/dashboard';
 
+import { login as apiLogin } from '../../api/auth';
+import { useAlertStore } from '../../store/AlertStore';
+
 export const LoginScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const signIn = useAuthStore(state => state.signIn);
+  const showAlert = useAlertStore(state => state.showAlert);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,28 +31,40 @@ export const LoginScreen = ({ navigation }: any) => {
   const containerWidth = width > 500 ? 390 : width;
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      showAlert({
+        title: t('common.error'),
+        message: t('auth.login.empty_fields'),
+        type: 'error'
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate Login API Call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
     try {
-      const mockToken = 'dev-token-bypass';
-      const mockProfile = { businessName: "PAUL'S COFFEE" };
-
-      // Architecture: High-speed parallel prefetch during the loader
-      await queryClient.prefetchQuery({
+      // 1. Perform Real Login
+      const response = await apiLogin({ email, password });
+      
+      // 2. High-speed parallel prefetch during the transition
+      // We don't await this to keep the "Instant Feel" unless you want 100% data ready
+      queryClient.prefetchQuery({
         queryKey: ['dashboardStartup'],
         queryFn: getStartupData,
         staleTime: 1000 * 60 * 5,
       }).catch(err => console.log('Prefetch warning:', err));
       
-      // Once prefetch is done (or failed), we commit the token.
-      // This will trigger the RootNavigator to swap to TabNavigator, 
-      // and DashboardScreen will mount with data already in RAM.
-      await signIn(mockToken, { id: 'dev-user', email: 'dev@opinor.app', businessName: "PAUL'S COFFEE" });
-    } catch (e) {
+      // 3. Commit session to Store & SecureStore
+      await signIn(response.token, response.user);
+      
+    } catch (e: any) {
       console.log('Login failed', e);
+      const errorMsg = e.response?.data?.message || t('auth.login.error_generic');
+      showAlert({
+        title: t('common.error'),
+        message: errorMsg,
+        type: 'error'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -129,6 +145,29 @@ export const LoginScreen = ({ navigation }: any) => {
             </AppText>
           </TouchableOpacity>
         </View>
+
+        {/* Quick Review Bypass (Testing Only) */}
+        {__DEV__ && (
+          <TouchableOpacity 
+            style={styles.bypassBtn} 
+            onPress={async () => {
+              const mockUser = {
+                id: 'mock-123',
+                firstName: 'Opinor',
+                lastName: 'Tester',
+                email: 'test@opinor.com',
+                businessName: 'From Scratch',
+                role: 'business_owner',
+                isActive: true
+              };
+              await signIn('mock-token', mockUser);
+            }}
+          >
+            <AppText variant="caption" style={{ color: colors.blue }}>
+              ⚡ Quick Review Bypass (Testing Only)
+            </AppText>
+          </TouchableOpacity>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -186,5 +225,10 @@ const styles = StyleSheet.create({
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    marginBottom: 40,
+  },
+  bypassBtn: {
+    alignItems: 'center',
+    paddingVertical: 12,
   }
 });

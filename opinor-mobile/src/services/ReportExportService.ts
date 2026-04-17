@@ -14,6 +14,8 @@ export interface ReportData {
   activityLabels?: string[];
 }
 
+import { useAlertStore } from '../store/AlertStore';
+
 /**
  * Fallback export service
  * Since expo-print and expo-sharing require native module installation 
@@ -27,11 +29,11 @@ export const exportReportToPDF = async (data: ReportData, t: any) => {
     await Clipboard.setStringAsync(reportText);
 
     // Inform the user
-    Alert.alert(
-      "Report Copied",
-      "PDF Export requires additional setup in your local environment. We have copied the report data to your clipboard as a formatted summary for yours to paste elsewhere.",
-      [{ text: "OK" }]
-    );
+    useAlertStore.getState().showAlert({
+      title: "Report Copied",
+      message: "PDF Export requires additional setup in your local environment. We have copied the report data to your clipboard as a formatted summary for you to paste elsewhere.",
+      type: 'info'
+    });
   } catch (error) {
     console.error('Error copying to clipboard:', error);
     throw error;

@@ -37,7 +37,9 @@
       "or_continue": "Ou continuer avec",
       "google_login": "Continuer avec Google",
       "no_account": "Vous n'avez pas de compte ? ",
-      "signup_link": "S'inscrire"
+      "signup_link": "S'inscrire",
+      "empty_fields": "Veuillez saisir votre e-mail et votre mot de passe.",
+      "error_generic": "Échec de la connexion. Veuillez vérifier vos identifiants."
     },
     "signup": {
       "step1_title": "Créer un compte",
@@ -84,7 +86,12 @@
         "2_5": "2 - 5",
         "5_10": "5 - 10",
         "10_plus": "10+"
-      }
+      },
+      "empty_business": "Veuillez saisir le nom de votre entreprise et sélectionner un secteur.",
+      "invalid_email": "Veuillez saisir une adresse e-mail valide.",
+      "password_mismatch": "Les mots de passe ne correspondent pas.",
+      "error_generic": "Échec de la demande d'inscription. Veuillez réessayer.",
+      "error_verify": "Échec de la vérification. Veuillez vérifier votre code."
     },
     "forgot_password": {
       "nav_title": "Mot de passe oublié",

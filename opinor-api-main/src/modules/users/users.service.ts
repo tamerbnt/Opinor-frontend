@@ -261,6 +261,13 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
+  async deleteAccount(userId: string): Promise<void> {
+    const user = await this.findById(userId);
+    // Perform soft delete or hard delete based on requirements
+    // For now, hard delete is requested for account removal
+    await this.userRepository.remove(user);
+  }
+
   async findAll(
     page = 1,
     limit = 20,

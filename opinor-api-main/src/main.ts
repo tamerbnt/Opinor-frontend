@@ -218,10 +218,6 @@ All endpoints are prefixed with \`/api/v1\`
   const port = process.env.PORT || 3000;
   // Bind to 0.0.0.0 for cloud deployment (Render, Railway, etc.)
   await app.listen(port, '0.0.0.0');
-  logger.log(`Application is running on port ${port}`);
-  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  if (!isProduction) {
-    logger.log(`Swagger documentation: /api/docs`);
-  }
+  console.log(`Application is running on: http://0.0.0.0:${port}/api/v1`);
 }
 bootstrap();

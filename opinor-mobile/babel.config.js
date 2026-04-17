@@ -1,9 +1,16 @@
 module.exports = function(api) {
   api.cache(true);
+  const isProd = api.env('production');
+  const plugins = [
+    'react-native-worklets/plugin',
+  ];
+
+  if (isProd) {
+    plugins.push('transform-remove-console');
+  }
+
   return {
     presets: ['babel-preset-expo'],
-    plugins: [
-      'react-native-worklets/plugin',
-    ],
+    plugins,
   };
 };

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  useWindowDimensions, ActivityIndicator, Alert, FlatList
+  useWindowDimensions, ActivityIndicator, FlatList
 } from 'react-native';
+import { useAlertStore } from '../../store/AlertStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   MessageCircle, ThumbsDown, Star, TrendingUp,
@@ -40,7 +41,7 @@ const PERIODS: { label: string; val: ReportPeriod }[] = [
 const chartStyles = StyleSheet.create({
   xLbl:  { fontSize: 10, color: '#9CA3AF', textAlign: 'center', marginTop: 6 },
   yLbl:  { fontSize: 9,  color: '#9CA3AF', textAlign: 'right', position: 'absolute', right: 4 },
-  grid:  { position: 'absolute', left: 0, right: 0, backgroundColor: 'rgba(150,150,150,0.18)' },
+  grid:  { position: 'absolute', left: 0, right: 0 },
 });
 
 const kpiStyles = StyleSheet.create({
@@ -117,7 +118,7 @@ const VerticalBarChart = ({
         <View style={{ height: trackHeight }}>
           {ticks.map((tick) => {
             const fromTop = trackHeight - (tick / maxTick) * trackHeight;
-            return <View key={tick} style={[chartStyles.grid, { top: fromTop, height: StyleSheet.hairlineWidth }]} />;
+            return <View key={tick} style={[chartStyles.grid, { top: fromTop, height: StyleSheet.hairlineWidth, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]} />;
           })}
 
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: trackHeight }}>
@@ -220,6 +221,7 @@ export const ReportsScreen = () => {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const navigation = useNavigation<Nav>();
+  const { showAlert } = useAlertStore();
 
   const [activeTab, setActiveTab] = useState<Tab>('Latest');
   const [periodIdx, setPeriodIdx] = useState(0);
@@ -282,7 +284,11 @@ export const ReportsScreen = () => {
         issuePercent: stats.issuePercent
       }, t);
     } catch (error) {
-      Alert.alert(t('common.error'), t('reports.export_error'));
+      showAlert({
+        title: t('common.error'),
+        message: t('reports.export_error'),
+        type: 'error'
+      });
     } finally {
       setIsExporting(false);
     }
@@ -306,7 +312,7 @@ export const ReportsScreen = () => {
     if (!distData) return [0, 0, 0, 0, 0];
     const buckets = [0, 0, 0, 0, 0];
     distData.forEach(d => {
-      const bucketIdx = Math.max(1, Math.min(Math.floor(d.ratingScore), 5)) - 1;
+      const bucketIdx = Math.max(1, Math.min(Math.round(d.ratingScore), 5)) - 1;
       buckets[bucketIdx] += d.count;
     });
     return buckets;

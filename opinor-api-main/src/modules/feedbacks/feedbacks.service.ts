@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, IsNull } from 'typeorm';
+import { Repository, MoreThan, IsNull, In } from 'typeorm';
 import {
   Feedback,
   User,
@@ -43,7 +43,7 @@ export class FeedbacksService {
     let sentiment: FeedbackSentiment;
     if (rating >= 4) {
       sentiment = FeedbackSentiment.POSITIVE;
-    } else if (rating <= 2) {
+    } else if (rating < 3) {
       sentiment = FeedbackSentiment.NEGATIVE;
     } else {
       sentiment = FeedbackSentiment.NEUTRAL;
@@ -84,7 +84,15 @@ export class FeedbacksService {
     const where: any = { businessId, isHidden: false, deletedAt: IsNull() };
     if (rating) where.rating = rating;
     if (sentiment) where.sentiment = sentiment;
-    if (status) where.status = status;
+    if (status) {
+      if (Array.isArray(status)) {
+        where.status = In(status);
+      } else if (typeof status === 'string' && status.includes(',')) {
+        where.status = In(status.split(','));
+      } else {
+        where.status = status;
+      }
+    }
     if (category) where.category = category;
 
     const [feedbacks, total] = await this.feedbackRepository.findAndCount({

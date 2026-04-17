@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,12 +8,14 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { AppText } from '../../../components/ui/AppText';
 import { ShieldCheck } from 'lucide-react-native';
 import { updateProfile } from '../../../api/users';
-
+import { useAlertStore } from '../../../store/AlertStore';
+  
 export const EditProfileScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  
+  const showAlert = useAlertStore(state => state.showAlert);
+
   const userProfile = useAuthStore(state => state.userProfile);
   const updateUserProfile = useAuthStore(state => state.updateUserProfile);
 
@@ -74,13 +76,21 @@ export const EditProfileScreen = ({ navigation }: any) => {
         phone: response.data.phone,
       });
 
-      Alert.alert(t('common.success') || 'Success', t('edit_profile.success_msg') || 'Profile updated successfully.');
+      showAlert({
+        title: t('common.success') || 'Success',
+        message: t('edit_profile.success_msg') || 'Profile updated successfully.',
+        type: 'success'
+      });
       navigation.goBack();
 
     } catch (err: any) {
       console.error('Update profile error:', err);
       const errMsg = err.response?.data?.message || err.message || 'Failed to update profile.';
-      Alert.alert(t('common.error') || 'Error', errMsg);
+      showAlert({
+        title: t('common.error') || 'Error',
+        message: errMsg,
+        type: 'error'
+      });
     } finally {
       setIsSaving(false);
     }

@@ -112,7 +112,7 @@ export const FeedbacksScreen = () => {
       const q: GetFeedbacksParams = { page: pageParam, limit: 15 };
       if (sortBy === 'newest') q.sortDir = 'DESC';
       if (sortBy === 'older') q.sortDir = 'ASC';
-      if (sortBy === 'read') q.status = 'viewed'; // Or responded, but the DTO accepts single status string
+      if (sortBy === 'read') q.status = 'viewed,responded';
       if (sortBy === 'unread') q.status = 'new';
       return getFeedbacks(q);
     },

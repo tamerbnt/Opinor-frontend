@@ -66,11 +66,33 @@ export const DashboardScreen = ({ navigation }: any) => {
 
   const chart = filterChart ?? initialChart;
 
+  const isNewUser = useMemo(() => {
+    if (!storeProfile?.createdAt) return false;
+    try {
+      const created = new Date(storeProfile.createdAt).getTime();
+      const now = new Date().getTime();
+      // Account is "new" if it was created in the last 15 minutes
+      // We use Math.abs to handle small clock skew between client and server
+      return Math.abs(now - created) < 1000 * 60 * 15;
+    } catch (e) {
+      return false;
+    }
+  }, [storeProfile?.createdAt]);
+
   const isLoading = isStartupLoading;
   const isError = isStartupError;
   const isChartLoading = isChartFetching && filter !== 'week';
   const hasData = (summary?.totalFeedbacksThisMonth ?? 0) > 0;
-  const showEmptyState = !isStartupLoading && !isStartupError && !hasData;
+  
+  // Fast-track empty state:
+  // 1. If we HAVE data, never show empty state.
+  // 2. If we are NEW, show empty state immediately (optimistic).
+  // 3. Otherwise, fallback to standard logic (wait for loading/error).
+  const showEmptyState = useMemo(() => {
+    if (hasData) return false;
+    if (isNewUser) return true;
+    return !isStartupLoading && !isStartupError && !hasData;
+  }, [hasData, isNewUser, isStartupLoading, isStartupError]);
 
   const handleRetry = () => {
     refetchStartup();
@@ -150,7 +172,7 @@ export const DashboardScreen = ({ navigation }: any) => {
       >
         <View style={[styles.avatarInner, { backgroundColor: colors.blue }]}>
           <Image
-            source={require('../../../assets/white vertical 2 (2).png')}
+            source={profile?.logo ? { uri: profile.logo } : (storeProfile?.logo ? { uri: storeProfile.logo } : require('../../../assets/new_logo.png'))}
             style={styles.avatarImage}
             resizeMode="contain"
           />
@@ -293,7 +315,7 @@ export const DashboardScreen = ({ navigation }: any) => {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.achievementsScroll}>
         <AchievementCard 
           type="positive" 
-          value="--" 
+          value={summary?.positiveCount ?? 0} 
           label={t('dashboard.stats.positive_feedbacks')} 
           style={{ marginRight: 12 }} 
         />
@@ -313,7 +335,7 @@ export const DashboardScreen = ({ navigation }: any) => {
   };
 
   // ── Error State (Premium Overhaul) ──
-  if (isError) {
+  if (isError && !isNewUser) {
     return (
       <View style={[styles.container, { backgroundColor: isDark ? colors.dark : colors.white, paddingTop: insets.top }]}>
         <View style={styles.errorContent}>

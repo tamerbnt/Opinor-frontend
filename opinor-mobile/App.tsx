@@ -11,7 +11,9 @@ import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from './src/store/useAuthStore';
+import { CustomAlert } from './src/components/ui/CustomAlert';
 
 // Keep the splash screen visible while we fetch custom fonts
 SplashScreen.preventAutoHideAsync();
@@ -20,8 +22,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
-      // Smart retry: never retry on 4xx client errors (auth, validation, not-found).
-      // Allow up to 2 background retries for genuine network/server failures.
       retry: (failureCount, error: any) => {
         if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
         return failureCount < 2;
@@ -41,6 +41,7 @@ const AppContent = () => {
   return (
     <View style={{ flex: 1, backgroundColor: isDark ? colors.dark : colors.white }}>
       <RootNavigator />
+      <CustomAlert />
       <StatusBar style={isDark ? "light" : "dark"} />
     </View>
   );
@@ -53,14 +54,30 @@ export default function App() {
     Inter_700Bold,
   });
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync(); // Hide splash screen once fonts are locked in
-    }
-  }, [fontsLoaded]);
+  const [appReady, setAppReady] = useState(false);
+  const rehydrate = useAuthStore((state) => state.rehydrate);
 
-  if (!fontsLoaded) {
-    return null; // Return empty until UI is 100% ready to render
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await rehydrate();
+      } catch (e) {
+        console.warn('Startup rehydration failed:', e);
+      } finally {
+        setAppReady(true);
+      }
+    }
+    prepare();
+  }, [rehydrate]);
+
+  useEffect(() => {
+    if (fontsLoaded && appReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, appReady]);
+
+  if (!fontsLoaded || !appReady) {
+    return null;
   }
 
   return (

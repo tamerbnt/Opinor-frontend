@@ -26,6 +26,16 @@ export class CreateUserDto {
   @IsEnum(BusinessType)
   businessType: BusinessType;
 
+  @ApiPropertyOptional({ example: 'Paul' })
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiPropertyOptional({ example: 'Barista' })
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
   @ApiPropertyOptional({ example: '+1234567890' })
   @IsOptional()
   @IsString()
@@ -35,4 +45,9 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @ApiPropertyOptional({ example: '1' })
+  @IsOptional()
+  @IsString()
+  branchCount?: string;
 }

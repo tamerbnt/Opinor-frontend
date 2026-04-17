@@ -50,3 +50,8 @@ export const getSettings = async () => {
   const { data } = await apiClient.get('/users/settings');
   return data;
 };
+
+export const deleteAccount = async () => {
+  const { data } = await apiClient.patch('/users/profile/delete');
+  return data;
+};

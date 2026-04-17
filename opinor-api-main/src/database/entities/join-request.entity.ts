@@ -14,6 +14,12 @@ export class JoinRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ name: 'first_name', nullable: true })
+  firstName: string;
+
+  @Column({ name: 'last_name', nullable: true })
+  lastName: string;
+
   @Column()
   email: string;
 
@@ -32,6 +38,9 @@ export class JoinRequest {
 
   @Column({ nullable: true })
   address: string;
+
+  @Column({ name: 'branch_count', nullable: true })
+  branchCount: string;
 
   @Column({
     type: 'enum',

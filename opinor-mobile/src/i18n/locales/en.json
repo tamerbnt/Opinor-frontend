@@ -37,7 +37,9 @@
       "or_continue": "Or continue with",
       "google_login": "Continue with Google",
       "no_account": "Don't have an account? ",
-      "signup_link": "Sign Up"
+      "signup_link": "Sign Up",
+      "empty_fields": "Please enter both email and password.",
+      "error_generic": "Login failed. Please check your credentials and try again."
     },
     "signup": {
       "step1_title": "Create Account",
@@ -84,7 +86,12 @@
         "2_5": "2 - 5",
         "5_10": "5 - 10",
         "10_plus": "10+"
-      }
+      },
+      "empty_business": "Please enter your business name and select an industry.",
+      "invalid_email": "Please enter a valid email address.",
+      "password_mismatch": "Passwords do not match.",
+      "error_generic": "Registration request failed. Please try again.",
+      "error_verify": "Verification failed. Please check your code."
     },
     "forgot_password": {
       "nav_title": "Forgot Password",

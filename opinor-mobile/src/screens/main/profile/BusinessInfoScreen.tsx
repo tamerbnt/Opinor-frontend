@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../theme/ThemeContext';
@@ -11,6 +11,7 @@ import { InputField } from '../../../components/ui/InputField';
 import { AppText } from '../../../components/ui/AppText';
 import { Dropdown } from '../../../components/ui/Dropdown';
 import { updateBusinessInfo } from '../../../api/users';
+import { useAlertStore } from '../../../store/AlertStore';
 
 export const BusinessInfoScreen = () => {
   const { colors, isDark } = useTheme();
@@ -19,11 +20,13 @@ export const BusinessInfoScreen = () => {
   const navigation = useNavigation();
   const userProfile = useAuthStore(state => state.userProfile);
   const updateUserProfile = useAuthStore(state => state.updateUserProfile);
+  const showAlert = useAlertStore(state => state.showAlert);
 
   const [logo, setLogo] = useState(userProfile?.logo || 'https://via.placeholder.com/150');
   const [businessName, setBusinessName] = useState(userProfile?.businessName || '');
   const [industry, setIndustry] = useState(userProfile?.businessCategory || '');
   const [location, setLocation] = useState(userProfile?.businessAddress || '');
+  const [branchCount, setBranchCount] = useState(userProfile?.branchCount || '1');
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -37,11 +40,22 @@ export const BusinessInfoScreen = () => {
     { label: t('auth.signup.industries.OTHER') || 'Other', value: 'OTHER' },
   ];
 
+  const branchOptions = [
+    { label: t('auth.signup.branch_counts.1') || '1', value: '1' },
+    { label: t('auth.signup.branch_counts.2_5') || '2 - 5', value: '2_5' },
+    { label: t('auth.signup.branch_counts.5_10') || '5 - 10', value: '5_10' },
+    { label: t('auth.signup.branch_counts.10_plus') || '10+', value: '10_plus' },
+  ];
+
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (permissionResult.granted === false) {
-       Alert.alert("Permission Required", "You've refused to allow this app to access your photos!");
+       showAlert({
+         title: "Permission Required",
+         message: "You've refused to allow this app to access your photos!",
+         type: 'warning'
+       });
        return;
     }
 
@@ -62,8 +76,9 @@ export const BusinessInfoScreen = () => {
     return businessName !== (userProfile?.businessName || '') ||
            industry !== (userProfile?.businessCategory || '') ||
            location !== (userProfile?.businessAddress || '') ||
+           branchCount !== (userProfile?.branchCount || '1') ||
            logo !== (userProfile?.logo || 'https://via.placeholder.com/150');
-  }, [businessName, industry, location, logo, userProfile]);
+  }, [businessName, industry, location, branchCount, logo, userProfile]);
 
   const isValid = businessName.length > 2;
 
@@ -81,6 +96,7 @@ export const BusinessInfoScreen = () => {
         businessName,
         businessCategory: industry,
         businessAddress: location,
+        branchCount,
         logo,
       };
 
@@ -90,16 +106,25 @@ export const BusinessInfoScreen = () => {
         businessName: response.data.businessName,
         businessCategory: response.data.businessCategory,
         businessAddress: response.data.businessAddress,
+        branchCount: response.data.branchCount,
         logo: response.data.logo,
       });
 
-      Alert.alert(t('common.success') || 'Success', t('business_info.success_msg') || 'Business updated successfully.');
+      showAlert({
+        title: t('common.success') || 'Success',
+        message: t('business_info.success_msg') || 'Business updated successfully.',
+        type: 'success'
+      });
       navigation.goBack();
 
     } catch (err: any) {
       console.error('Update business info error:', err);
       const errMsg = err.response?.data?.message || err.message || 'Failed to update business info.';
-      Alert.alert(t('common.error') || 'Error', errMsg);
+      showAlert({
+        title: t('common.error') || 'Error',
+        message: errMsg,
+        type: 'error'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -148,6 +173,14 @@ export const BusinessInfoScreen = () => {
               value={industry}
               options={industryOptions}
               onSelect={setIndustry}
+            />
+            
+            <Dropdown
+              label={t('business_info.labels.branches') || 'Branches'}
+              placeholder={t('business_info.placeholders.branches') || '1'}
+              value={branchCount}
+              options={branchOptions}
+              onSelect={setBranchCount}
             />
 
             <InputField

@@ -14,6 +14,10 @@ export const SplashScreen = ({ navigation }: any) => {
 
   useEffect(() => {
     const bootstrapAsync = async () => {
+      // TEMPORARY: Reset onboarding state and Auth for testing alignment
+      await SecureStore.deleteItemAsync('hasSeenOnboarding');
+      await SecureStore.deleteItemAsync('accessToken');
+      
       const minDelay = new Promise(resolve => setTimeout(resolve, 1500)); // Minimum branding delay
 
       try {
@@ -50,8 +54,14 @@ export const SplashScreen = ({ navigation }: any) => {
         console.log('Bootstrap error', e);
       }
 
+      const hasSeenOnboarding = await SecureStore.getItemAsync('hasSeenOnboarding');
       await minDelay;
-      navigation.replace('Onboarding');
+      
+      if (hasSeenOnboarding === 'true') {
+        navigation.replace('TeamChoice');
+      } else {
+        navigation.replace('Onboarding');
+      }
     };
 
     bootstrapAsync();

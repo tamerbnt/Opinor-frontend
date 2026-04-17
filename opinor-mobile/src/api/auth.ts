@@ -33,6 +33,24 @@ export interface AuthMeResponse {
   createdAt?: string;
 }
 
+export const login = async (payload: any) => {
+  const { data } = await apiClient.post('/auth/login', payload);
+  // API returns { success: true, data: { user, token, refreshToken } }
+  return data.data;
+};
+
+export const submitJoinRequest = async (payload: any) => {
+  const { data } = await apiClient.post('/join-requests', payload);
+  // API returns { success: true, data: { message: "...", code: "..." } }
+  return data.data;
+};
+
+export const register = async (payload: any) => {
+  const { data } = await apiClient.post('/auth/register', payload);
+  // API returns { success: true, data: { ...user, token } }
+  return data.data;
+};
+
 export const getCurrentProfile = async (): Promise<AuthMeResponse> => {
   const { data } = await apiClient.get('/auth/me');
   // API returns { success: true, data: { ...profile } }

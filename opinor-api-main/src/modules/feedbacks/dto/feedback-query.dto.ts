@@ -33,12 +33,10 @@ export class FeedbackQueryDto {
   sentiment?: string;
 
   @ApiPropertyOptional({
-    description: 'Filter by status',
-    enum: ['new', 'viewed', 'responded', 'archived'],
+    description: 'Filter by status (can be a comma-separated list like "viewed,responded")',
   })
   @IsOptional()
   @IsString()
-  @IsIn(['new', 'viewed', 'responded', 'archived'])
   status?: string;
 
   @ApiPropertyOptional({ description: 'Filter by category' })

@@ -27,6 +27,22 @@ export class CreateJoinRequestDto {
   businessType: BusinessType;
 
   @ApiPropertyOptional({
+    example: 'Paul',
+    description: "Owner's first name",
+  })
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiPropertyOptional({
+    example: 'Barista',
+    description: "Owner's last name",
+  })
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @ApiPropertyOptional({
     example: '+1234567890',
     description: 'Contact phone number',
   })
@@ -41,4 +57,12 @@ export class CreateJoinRequestDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @ApiPropertyOptional({
+    example: '1',
+    description: 'Number of branches',
+  })
+  @IsOptional()
+  @IsString()
+  branchCount?: string;
 }

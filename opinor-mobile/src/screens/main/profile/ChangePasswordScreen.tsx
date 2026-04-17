@@ -7,10 +7,13 @@ import { InputField } from '../../../components/ui/InputField';
 import { AppText } from '../../../components/ui/AppText';
 import { changePassword } from '../../../api/auth';
 
+import { useAlertStore } from '../../../store/AlertStore';
+
 export const ChangePasswordScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const showAlert = useAlertStore(state => state.showAlert);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -28,12 +31,20 @@ export const ChangePasswordScreen = ({ navigation }: any) => {
     setIsSubmitting(true);
     try {
       await changePassword({ currentPassword, newPassword });
-      Alert.alert(t('common.success') || 'Success', t('change_password.success') || 'Your password was changed successfully.');
+      showAlert({
+        title: t('common.success') || 'Success',
+        message: t('change_password.success') || 'Your password was changed successfully.',
+        type: 'success'
+      });
       navigation.goBack();
     } catch (err: any) {
       console.error('Change password failed', err);
       const msg = err.response?.data?.message || err.message || 'Failed to change password. Ensure your current password is correct.';
-      Alert.alert(t('common.error') || 'Security Error', msg);
+      showAlert({
+        title: t('common.error') || 'Security Error',
+        message: msg,
+        type: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }

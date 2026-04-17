@@ -4,6 +4,7 @@ import { useTheme } from '../../../theme/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { useAlertStore } from '../../../store/AlertStore';
 import { 
   User, 
   QrCode, 
@@ -26,18 +27,50 @@ const HEADER_ZONE_HEIGHT = 200;
 const AVATAR_OVERLAP = 60;
 const AVATAR_SIZE = 120;
 
+import { updateBusinessInfo, deleteAccount as apiDeleteAccount } from '../../../api/users';
+
 export const ProfileMainScreen = ({ navigation }: any) => {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const userProfile = useAuthStore(state => state.userProfile);
   const signOut = useAuthStore(state => state.signOut);
+  const showAlert = useAlertStore(state => state.showAlert);
+
+  const handleDeleteAccount = () => {
+    showAlert({
+      title: t('profile.actions.delete_account') || "Delete Account",
+      message: "Are you sure you want to permanently delete your account? This action cannot be undone.",
+      type: 'error',
+      buttons: [
+        { text: t('profile.actions.cancel'), style: "cancel" },
+        { 
+          text: t('profile.actions.delete'), 
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await apiDeleteAccount();
+              await signOut();
+            } catch (err: any) {
+              console.error('Delete account error:', err);
+              showAlert({
+                title: t('common.error'),
+                message: err.response?.data?.message || "Failed to delete account.",
+                type: 'error'
+              });
+            }
+          }
+        }
+      ]
+    });
+  };
 
   const handleClearCache = () => {
-    Alert.alert(
-      t('profile.actions.clear_cache_title'),
-      t('profile.actions.clear_cache_msg'),
-      [
+    showAlert({
+      title: t('profile.actions.clear_cache_title'),
+      message: t('profile.actions.clear_cache_msg'),
+      type: 'warning',
+      buttons: [
         { text: t('profile.actions.cancel'), style: "cancel" },
         { 
           text: t('profile.actions.clear'), 
@@ -45,7 +78,7 @@ export const ProfileMainScreen = ({ navigation }: any) => {
           onPress: () => console.log("Cache Cleared")
         }
       ]
-    );
+    });
   };
 
   const SettingItem = ({ icon: Icon, label, onPress, isLast = false }: any) => (
@@ -82,7 +115,7 @@ export const ProfileMainScreen = ({ navigation }: any) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#1F2428' : '#FFFFFF' }]}>
 
       {/* ── Header Zone — Theme-aware background ── */}
       <View style={[
@@ -110,12 +143,9 @@ export const ProfileMainScreen = ({ navigation }: any) => {
 
       {/* ── White Card + Avatar ── */}
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 120 }
-        ]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        bounces={false}
+        bounces={true}
       >
         {/* Spacer that matches the dark zone height, minus the avatar overlap */}
         <View style={{ height: HEADER_ZONE_HEIGHT - AVATAR_OVERLAP }} />
@@ -135,7 +165,7 @@ export const ProfileMainScreen = ({ navigation }: any) => {
                 {/* Inner teal background with app logo */}
                 <View style={styles.avatarInner}>
                   <Image
-                    source={require('../../../../assets/white vertical 2 (2).png')}
+                    source={userProfile?.logo ? { uri: userProfile.logo } : require('../../../../assets/new_logo.png')}
                     style={styles.avatarImage}
                     resizeMode="contain"
                   />
@@ -233,6 +263,7 @@ export const ProfileMainScreen = ({ navigation }: any) => {
                 styles.primaryButton, 
                 { backgroundColor: isDark ? '#D9534F' : '#FEE2E2', marginTop: 12 }
               ]}
+              onPress={handleDeleteAccount}
             >
               <Text style={[
                 styles.primaryButtonText, 
@@ -240,6 +271,9 @@ export const ProfileMainScreen = ({ navigation }: any) => {
               ]}>{t('profile.actions.delete_account')}</Text>
             </TouchableOpacity>
           </View>
+          
+          {/* Bottom spacing to account for TabBar + Safe Area */}
+          <View style={{ height: insets.bottom + 120 }} />
         </View>
 
       </ScrollView>
@@ -248,7 +282,10 @@ export const ProfileMainScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { 
+    flex: 1,
+    backgroundColor: '#FFFFFF', // Initial Light Mode fallback
+  },
 
   // ── Header Zone ──────────────────────────────────────────────────────
   headerZone: {

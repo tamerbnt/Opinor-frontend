@@ -153,4 +153,25 @@ export class UsersController {
   async getSettings(@CurrentUser() user: User) {
     return this.usersService.getSettingsResponse(user.id);
   }
+
+  @Patch('profile/delete')
+  @ApiOperation({
+    summary: 'Delete account',
+    description: 'Permanently deletes the user account',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        success: true,
+        message: 'Account deleted successfully',
+      },
+    },
+  })
+  async deleteAccount(@CurrentUser() user: User) {
+    await this.usersService.deleteAccount(user.id);
+    return {
+      success: true,
+      message: 'Account deleted successfully',
+    };
+  }
 }

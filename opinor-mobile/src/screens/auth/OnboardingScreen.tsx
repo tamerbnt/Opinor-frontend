@@ -4,6 +4,7 @@ import { AppText } from '../../components/ui/AppText';
 import { useTheme } from '../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react-native';
+import * as SecureStore from 'expo-secure-store';
 
 export const OnboardingScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
@@ -48,18 +49,23 @@ export const OnboardingScreen = ({ navigation }: any) => {
       subtitle: t('onboarding.slides.slide3.subtitle'),
       illustration: require('../../../assets/onboard 3 x3.png'),
       vector: require('../../../assets/Vector 3 x3.png'),
-      vectorTop: 415,
+      vectorTop: 424,
       vectorScaleY: 1.10,
       illuW: 320,
       illuH: 310,
     }
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeIndex < slides.length - 1) {
       scrollRef.current?.scrollTo({ x: (activeIndex + 1) * containerWidth, animated: true });
       setActiveIndex(activeIndex + 1);
     } else {
+      try {
+        await SecureStore.setItemAsync('hasSeenOnboarding', 'true');
+      } catch (e) {
+        console.log('Error saving onboarding state', e);
+      }
       navigation.navigate('TeamChoice');
     }
   };

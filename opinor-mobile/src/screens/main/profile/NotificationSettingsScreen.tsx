@@ -8,11 +8,14 @@ import { Bell, Mail } from 'lucide-react-native';
 import { getSettings, updateSettings } from '../../../api/users';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { useAlertStore } from '../../../store/AlertStore';
+
 export const NotificationSettingsScreen = () => {
   const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const showAlert = useAlertStore(state => state.showAlert);
 
   // Load actual server settings
   const { data, isLoading, isError } = useQuery({
@@ -38,7 +41,11 @@ export const NotificationSettingsScreen = () => {
     },
     onError: (err: any) => {
       console.error('Failed to save setting:', err);
-      Alert.alert(t('common.error') || 'Error', t('common.generic_error') || 'Failed to update setting. Please try again.');
+      showAlert({
+        title: t('common.error') || 'Error',
+        message: t('common.generic_error') || 'Failed to update setting. Please try again.',
+        type: 'error'
+      });
       // Revert states on error
       if (data?.data) {
         setPushEnabled(!!data.data.pushNotifications);

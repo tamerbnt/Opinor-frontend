@@ -9,6 +9,7 @@ interface AuthState {
   signIn: (token: string, profile: UserProfile | null) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
+  rehydrate: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -33,5 +34,18 @@ export const useAuthStore = create<AuthState>((set) => ({
         ? { ...state.userProfile, ...newProfile } as UserProfile
         : null,
     }));
+  },
+  rehydrate: async () => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      const profileStr = await SecureStore.getItemAsync('userProfile');
+      const profile = profileStr ? JSON.parse(profileStr) : null;
+      
+      if (token) {
+        set({ accessToken: token, userProfile: profile });
+      }
+    } catch (e) {
+      console.error('Failed to rehydrate auth store:', e);
+    }
   },
 }));

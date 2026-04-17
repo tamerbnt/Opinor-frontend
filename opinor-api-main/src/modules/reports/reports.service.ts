@@ -76,7 +76,7 @@ export class ReportsService {
             ((totalFeedbacks - previousFeedbacks) / previousFeedbacks) *
             100
           ).toFixed(1)
-        : '0';
+        : totalFeedbacks > 0 ? '100.0' : '0.0';
 
     // 1. Calculate Top Negative Issue
     const negativeFeedbacks = feedbacks.filter((f) => parseFloat(f.rating.toString()) < 3);
@@ -121,10 +121,18 @@ export class ReportsService {
       const weekCounts = [0, 0, 0, 0];
       for (const f of feedbacks) {
          const fDate = new Date(f.createdAt);
-         const dayOfMonth = fDate.getDate(); // 1-31
-         const weekIdx = Math.min(Math.floor((dayOfMonth - 1) / 7), 3); // bucket into 0..3
+         const dayOfMonth = fDate.getDate();
+         const weekIdx = Math.min(Math.floor((dayOfMonth - 1) / 7), 3);
          weekCounts[weekIdx]++;
       }
+      
+      // Normalize W4 to avoid visual skew (W4 has 22-31 = up to 10 days)
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const w4Days = lastDay - 21;
+      if (w4Days > 0 && w4Days !== 7) {
+        weekCounts[3] = Math.round((weekCounts[3] / w4Days) * 7);
+      }
+      
       activity = weekCounts;
       activityLabels = ['W1', 'W2', 'W3', 'W4'];
     }
